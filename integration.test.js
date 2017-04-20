@@ -1,4 +1,4 @@
-import {Producer, Connection} from './index';
+import {Producer} from './index';
 
 describe('Beanstalkd integration', () => {
 	let producer;
@@ -17,7 +17,7 @@ describe('Beanstalkd integration', () => {
 	});
 
 	test('Connects to beanstalkd', () => {
-		return expect(connection).toBeInstanceOf(Connection);
+		return expect(connection).toBeInstanceOf(Producer);
 	});
 
 	test('Correct tube used', () => {
@@ -28,9 +28,20 @@ describe('Beanstalkd integration', () => {
 
 	test('Add job to beanstalkd', () => {
 		return connection.send({message: 'hello'}).then(connection => {
-			expect(connection).toBeInstanceOf(Connection);
+			expect(connection).toBeInstanceOf(Producer);
 		});
 	});
+
+    test('Receive job from beanstalkd', () => {
+        // let message = {message: 'hello'};
+        // return connection.send(message)
+        // .then(conn => {
+        //     return conn.recieve();
+        // })
+        // .then(payload => {
+        //     expect(payload).toEqual(message);
+        // })
+    });
 
 	afterAll(done => {
 		connection._delete_all_ready(() => {
