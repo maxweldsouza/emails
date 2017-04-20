@@ -1,37 +1,44 @@
 import {Producer, Connection} from './index';
 
 describe('Beanstalkd integration', () => {
-	let options = {
+    let producer;
+    let connection;
+    let options = {
         hostname: '127.0.0.1',
         port: 11300,
         tube: 'test_integration'
     };
-	test('Connects to beanstalkd', () => {
-		let producer = new Producer(options);
-		return producer.connect().then(connection => {
-			expect(connection).toBeInstanceOf(Connection);
-		});
+
+    beforeAll(() => {
+        producer = new Producer(options);
+        return producer.connect().then(conn => {
+            connection = conn;
+        });
+    });
+
+    test('Connects to beanstalkd', () => {
+		return expect(connection).toBeInstanceOf(Connection);
 	});
 
     test('Correct tube used', () => {
-        let producer = new Producer(options);
-        return producer.connect().then(connection => {
-            return connection._tubename();
-        })
+        connection._tubename()
         .then(tubename => {
             expect(tubename).toBe(options.tube);
         });
     });
 
 	test('Add job to beanstalkd', () => {
-		let producer = new Producer(options);
-		return producer
-			.connect()
-			.then(connection => {
-				return connection.send({message: 'hello'});
-			})
-			.then(connection => {
-				expect(connection).toBeInstanceOf(Connection);
-			});
+		return connection.send({message: 'hello'})
+    		.then(connection => {
+    			expect(connection).toBeInstanceOf(Connection);
+    		});
 	});
+
+    afterAll(done => {
+        connection._delete_all_ready(() => {
+            connection.quit().then(() => {
+                done();
+            });
+        });
+    });
 });

@@ -18,6 +18,25 @@ export class Connection {
             });
         })
     }
+    _delete_all_ready (callback) {
+        console.log('Delete all ready called')
+            this.client.peek_ready((err, jobid) => {
+                if (err === 'NOT_FOUND') {
+                    callback();
+                    console.log('All jobs deleted');
+                } else if (err) {
+                    console.error('Could not peek ready jobs', err);
+                } else {
+                    this.client.destroy(jobid, (error) => {
+                        if (error) {
+                            console.error('Could not delete job', err);
+                        } else {
+                            this._delete_all_ready(callback);
+                        }
+                    });
+                }
+            });
+    }
 	send() {
 		return new Promise((resolve, reject) => {
 			let payload = {hello: 'world'};
@@ -31,6 +50,14 @@ export class Connection {
 			});
 		});
 	}
+    quit () {
+        return new Promise((resolve, reject) => {
+            this.client.quit(() => {
+                console.log('Connection closed');
+                resolve();
+            });
+        })
+    }
 }
 
 export class Producer {
