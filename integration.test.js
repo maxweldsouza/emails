@@ -1,9 +1,13 @@
 import { Producer, Connection } from './index';
 
-test('connects to beanstalkd', () => {
+test('Connects to beanstalkd', () => {
     let producer = new Producer();
     return producer.connect()
-    .then(status => {
-        expect(status).toBeInstanceOf(Connection);
+    .then(connection => {
+        expect(connection).toBeInstanceOf(Connection);
     })
 })
+
+test('Add job to beanstalkd', () => {
+
+});
