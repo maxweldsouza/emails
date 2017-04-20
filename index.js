@@ -19,11 +19,10 @@ export class Connection {
 		});
 	}
 	_delete_all_ready(callback) {
-		console.log('Delete all ready called');
 		this.client.peek_ready((err, jobid) => {
 			if (err === 'NOT_FOUND') {
 				callback();
-				console.log('All jobs deleted');
+				console.log('All ready jobs deleted');
 			} else if (err) {
 				console.error('Could not peek ready jobs', err);
 			} else {
@@ -53,7 +52,6 @@ export class Connection {
 	quit() {
 		return new Promise((resolve, reject) => {
 			this.client.quit(() => {
-				console.log('Connection closed');
 				resolve();
 			});
 		});
