@@ -1,8 +1,25 @@
 import fivebeans from 'fivebeans';
 
+const DEFAULT_PRIORITY = 1;
+const ZERO_DELAY = 0;
+const TIME_TO_RUN = 10;
+
 export class Connection {
     constructor (client) {
         this.client = client;
+    }
+    send () {
+        return new Promise((resolve, reject) => {
+            let payload = { 'hello' : 'world' };
+            this.client.put(DEFAULT_PRIORITY, ZERO_DELAY, TIME_TO_RUN, JSON.stringify(payload), (err, jobid) => {
+                if (err) {
+                    reject();
+                } else {
+                    console.log(`Job added ${jobid}`)
+                    resolve(this);
+                }
+            })
+        })
     }
 }
 
@@ -28,8 +45,3 @@ export class Producer {
         });
     }
 }
-export function consumer () {
-}
-
-
-console.log('Started ...');
