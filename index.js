@@ -66,9 +66,8 @@ export class Producer extends Base {
                 .connect();
         });
     }
-	send() {
+	send(payload) {
 		return new Promise((resolve, reject) => {
-			let payload = {hello: 'world'};
 			this.client.put(DEFAULT_PRIORITY, ZERO_DELAY, TIME_TO_RUN, JSON.stringify(payload), (err, jobid) => {
 				if (err) {
 					reject();
@@ -79,6 +78,28 @@ export class Producer extends Base {
 			});
 		});
 	}
+}
+
+export class Consumer extends Base {
+    connect() {
+        return new Promise((resolve, reject) => {
+            this.client
+                .on('connect', () => {
+                    this.client.watch(this.tube, (err, tubename) => {
+                        resolve(this);
+                        console.log('Connected to beanstalkd');
+                    });
+                })
+                .on('error', err => {
+                    reject('failed');
+                    console.error('Couldnt connect to beanstalkd', err);
+                })
+                .on('close', () => {
+                    console.log('Beanstalkd connection closed');
+                })
+                .connect();
+        });
+    }
     recieve () {
         return new Promise((resolve, reject) => {
             this.client.reserve_with_timeout(3, (err, jobid, payload) => {
