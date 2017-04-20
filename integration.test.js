@@ -3,7 +3,7 @@ import {Producer, Consumer} from './index';
 describe('Beanstalkd integration', () => {
 	let producer;
 	let consumer;
-	let connection;
+
 	let options = {
 		hostname: '127.0.0.1',
 		port: 11300,
@@ -12,11 +12,10 @@ describe('Beanstalkd integration', () => {
 
 	beforeAll(() => {
 		producer = new Producer(options);
-        consumer = new Consumer(options);
-		return producer.connect()
-            .then(() => {
-                return consumer.connect();
-            });
+		consumer = new Consumer(options);
+		return producer.connect().then(() => {
+			return consumer.connect();
+		});
 	});
 
 	test('Connects to beanstalkd', () => {
@@ -37,14 +36,15 @@ describe('Beanstalkd integration', () => {
 
 	test('Receive job from beanstalkd', () => {
 		let message = {message: 'hello'};
-		return producer.send(message)
-		.then(() => {
-		    return consumer.recieve();
-		})
-		.then(buffer => {
-            let result = JSON.parse(buffer.toString('ascii'));
-		    expect(result).toEqual(message);
-		})
+		return producer
+			.send(message)
+			.then(() => {
+				return consumer.recieve();
+			})
+			.then(buffer => {
+				let result = JSON.parse(buffer.toString('ascii'));
+				expect(result).toEqual(message);
+			});
 	});
 
 	afterAll(done => {

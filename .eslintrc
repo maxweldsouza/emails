@@ -1,7 +1,15 @@
 {
-    "parser": "babel-eslint",
-    "env": {
-        "node": true
+    "extends": "aftership",
+    "plugins": [
+        "prettier",
+        "jest"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
     },
-    "extends": "aftership"
+    "env": {
+        "node": true,
+        "jest": true
+    },
 }
