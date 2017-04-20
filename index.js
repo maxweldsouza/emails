@@ -5,9 +5,19 @@ const ZERO_DELAY = 0;
 const TIME_TO_RUN = 10;
 
 export class Connection {
-	constructor(client) {
+	constructor({client, tube}) {
 		this.client = client;
 	}
+    _tubename () {
+        return new Promise((resolve, reject) => {
+            this.client.list_tube_used((err, tubename) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve(tubename);
+            });
+        })
+    }
 	send() {
 		return new Promise((resolve, reject) => {
 			let payload = {hello: 'world'};
@@ -24,16 +34,22 @@ export class Connection {
 }
 
 export class Producer {
-	constructor({hostname, port}) {
+	constructor({hostname, port, tube}) {
 		this.client = new fivebeans.client(hostname, port);
+        this.tube = tube;
 	}
 	connect() {
 		return new Promise((resolve, reject) => {
 			this.client
 				.on('connect', () => {
-					let connection = new Connection(this.client);
-					resolve(connection);
-					console.log('Connected to beanstalkd');
+                    this.client.use(this.tube, (err, tubename) => {
+                        let connection = new Connection({
+                            client: this.client,
+                            tube: this.tube
+                        });
+                        resolve(connection);
+                        console.log('Connected to beanstalkd');
+                    })
 				})
 				.on('error', err => {
 					reject('failed');
