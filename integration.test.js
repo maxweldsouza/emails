@@ -11,41 +11,39 @@ describe('Beanstalkd integration', () => {
 
 	beforeAll(() => {
 		producer = new Producer(options);
-		return producer.connect().then(conn => {
-			connection = conn;
-		});
+		return producer.connect();
 	});
 
 	test('Connects to beanstalkd', () => {
-		return expect(connection).toBeInstanceOf(Producer);
+		return expect(producer).toBeInstanceOf(Producer);
 	});
 
 	test('Correct tube used', () => {
-		connection._tubename().then(tubename => {
+		producer._tubename().then(tubename => {
 			expect(tubename).toBe(options.tube);
 		});
 	});
 
 	test('Add job to beanstalkd', () => {
-		return connection.send({message: 'hello'}).then(connection => {
+		return producer.send({message: 'hello'}).then(connection => {
 			expect(connection).toBeInstanceOf(Producer);
 		});
 	});
 
-    test('Receive job from beanstalkd', () => {
-        // let message = {message: 'hello'};
-        // return connection.send(message)
-        // .then(conn => {
-        //     return conn.recieve();
-        // })
-        // .then(payload => {
-        //     expect(payload).toEqual(message);
-        // })
-    });
+	test('Receive job from beanstalkd', () => {
+		// let message = {message: 'hello'};
+		// return connection.send(message)
+		// .then(conn => {
+		//     return conn.recieve();
+		// })
+		// .then(payload => {
+		//     expect(payload).toEqual(message);
+		// })
+	});
 
 	afterAll(done => {
-		connection._delete_all_ready(() => {
-			connection.quit().then(() => {
+		producer._delete_all_ready(() => {
+			producer.quit().then(() => {
 				done();
 			});
 		});
