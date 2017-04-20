@@ -24,8 +24,8 @@ export class Connection {
 }
 
 export class Producer {
-    constructor () {
-        this.client = new fivebeans.client('127.0.0.1', 11300);
+    constructor ({ hostname, port }) {
+        this.client = new fivebeans.client(hostname, port);
     }
     connect () {
         return new Promise((resolve, reject) => {
@@ -34,9 +34,9 @@ export class Producer {
                 resolve (connection);
                 console.log('Connected to beanstalkd');
             })
-            .on('error', () => {
+            .on('error', (err) => {
                 reject ('failed');
-                console.error('Couldnt connect to beanstalkd');
+                console.error('Couldnt connect to beanstalkd', err);
             })
             .on('close', () => {
                 console.log('Beanstalkd connection closed');
