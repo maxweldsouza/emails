@@ -8,35 +8,35 @@ export class Connection {
 	constructor({client, tube}) {
 		this.client = client;
 	}
-    _tubename () {
-        return new Promise((resolve, reject) => {
-            this.client.list_tube_used((err, tubename) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve(tubename);
-            });
-        })
-    }
-    _delete_all_ready (callback) {
-        console.log('Delete all ready called')
-            this.client.peek_ready((err, jobid) => {
-                if (err === 'NOT_FOUND') {
-                    callback();
-                    console.log('All jobs deleted');
-                } else if (err) {
-                    console.error('Could not peek ready jobs', err);
-                } else {
-                    this.client.destroy(jobid, (error) => {
-                        if (error) {
-                            console.error('Could not delete job', err);
-                        } else {
-                            this._delete_all_ready(callback);
-                        }
-                    });
-                }
-            });
-    }
+	_tubename() {
+		return new Promise((resolve, reject) => {
+			this.client.list_tube_used((err, tubename) => {
+				if (err) {
+					reject(err);
+				}
+				resolve(tubename);
+			});
+		});
+	}
+	_delete_all_ready(callback) {
+		console.log('Delete all ready called');
+		this.client.peek_ready((err, jobid) => {
+			if (err === 'NOT_FOUND') {
+				callback();
+				console.log('All jobs deleted');
+			} else if (err) {
+				console.error('Could not peek ready jobs', err);
+			} else {
+				this.client.destroy(jobid, error => {
+					if (error) {
+						console.error('Could not delete job', err);
+					} else {
+						this._delete_all_ready(callback);
+					}
+				});
+			}
+		});
+	}
 	send() {
 		return new Promise((resolve, reject) => {
 			let payload = {hello: 'world'};
@@ -50,33 +50,33 @@ export class Connection {
 			});
 		});
 	}
-    quit () {
-        return new Promise((resolve, reject) => {
-            this.client.quit(() => {
-                console.log('Connection closed');
-                resolve();
-            });
-        })
-    }
+	quit() {
+		return new Promise((resolve, reject) => {
+			this.client.quit(() => {
+				console.log('Connection closed');
+				resolve();
+			});
+		});
+	}
 }
 
 export class Producer {
 	constructor({hostname, port, tube}) {
 		this.client = new fivebeans.client(hostname, port);
-        this.tube = tube;
+		this.tube = tube;
 	}
 	connect() {
 		return new Promise((resolve, reject) => {
 			this.client
 				.on('connect', () => {
-                    this.client.use(this.tube, (err, tubename) => {
-                        let connection = new Connection({
-                            client: this.client,
-                            tube: this.tube
-                        });
-                        resolve(connection);
-                        console.log('Connected to beanstalkd');
-                    })
+					this.client.use(this.tube, (err, tubename) => {
+						let connection = new Connection({
+							client: this.client,
+							tube: this.tube
+						});
+						resolve(connection);
+						console.log('Connected to beanstalkd');
+					});
 				})
 				.on('error', err => {
 					reject('failed');
