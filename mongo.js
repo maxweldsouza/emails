@@ -29,9 +29,4 @@ export default class Mail {
     	);
     	db.close();
     }
-    async _danger_clear_collection() {
-        let db = await MongoClient.connect(this.url);
-    	await db.collection(this.collection).remove();
-    	db.close();
-    }
 }

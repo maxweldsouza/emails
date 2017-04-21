@@ -34,7 +34,6 @@ describe('Mongodb integration', () => {
         let item = await db.collection('mails').findOne({
             _id: new ObjectID(id)
         });
-        console.log(item)
         expect(item.attempts.length).toBe(1);
         await db.collection('mails').deleteOne({
             _id: new ObjectID(id)
