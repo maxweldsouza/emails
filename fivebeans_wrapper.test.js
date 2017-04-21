@@ -15,3 +15,11 @@ test('Can use promises', () => {
         return fb.quit();
     });
 });
+
+test('Can use tube', async () => {
+    let fb = new FiveBeans();
+    await fb.connect();
+    let tubename = await fb.use('test_fivebeans_wrapper');
+    expect(tubename).toBe('test_fivebeans_wrapper');
+    await fb.quit();
+});

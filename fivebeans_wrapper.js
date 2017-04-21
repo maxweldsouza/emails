@@ -18,6 +18,17 @@ export default class FiveBeans {
             .connect();
         })
     }
+    use (tube) {
+        return new Promise((resolve, reject) => {
+            this.client.use(tube, (err, tubename) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(tubename);
+                }
+            });
+        })
+    }
     quit () {
         return new Promise((resolve, reject) => {
             this.client
