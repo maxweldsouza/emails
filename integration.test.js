@@ -33,8 +33,8 @@ describe('Beanstalkd integration', () => {
 	test('Receive job from beanstalkd', async () => {
 		let message = {message: 'hello'};
 		await producer.send(message);
-		let buffer = await consumer.recieve();
-		let result = JSON.parse(buffer.toString('ascii'));
+		let {jobid, payload} = await consumer.recieve();
+		let result = JSON.parse(payload.toString('ascii'));
 		expect(result).toEqual(message);
 	});
 

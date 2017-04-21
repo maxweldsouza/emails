@@ -22,6 +22,22 @@ test('Can use tube', async () => {
     await fb.quit();
 });
 
+test('Can list tube used', async () => {
+    let fb = new FiveBeans();
+    await fb.connect();
+    await fb.use('test_fivebeans_wrapper');
+    let tubename = await fb.list_tube_used();
+    expect(tubename).toBe('test_fivebeans_wrapper');
+    await fb.quit();
+});
+
+test('Can watch tube', async () => {
+    let fb = new FiveBeans();
+    await fb.connect();
+    let tubename = await fb.watch('test_fivebeans_wrapper');
+    await fb.quit();
+});
+
 describe('Can put and delete jobs', () => {
     let fb = new FiveBeans();
     beforeEach(async () => {

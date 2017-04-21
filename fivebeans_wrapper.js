@@ -27,6 +27,28 @@ export default class FiveBeans {
             });
         })
     }
+    list_tube_used () {
+        return new Promise((resolve, reject) => {
+            this.client.list_tube_used((err, tubename) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(tubename);
+                }
+            })
+        })
+    }
+    watch (tube) {
+        return new Promise((resolve, reject) => {
+            this.client.watch(tube, (err, tubename) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(tubename);
+                }
+            });
+        })
+    }
     put ({ priority, delay, payload }) {
         return new Promise((resolve, reject) => {
             this.client.put(priority, delay, 0, JSON.stringify(payload), (err, jobid) => {
@@ -34,6 +56,17 @@ export default class FiveBeans {
                     reject(err);
                 } else {
                     resolve(jobid);
+                }
+            })
+        })
+    }
+    reserve () {
+        return new Promise((resolve, reject) => {
+            this.client.reserve((err, jobid, payload) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({jobid, payload});
                 }
             })
         })
