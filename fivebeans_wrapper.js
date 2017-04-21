@@ -27,6 +27,28 @@ export default class FiveBeans {
             });
         })
     }
+    put ({ priority, delay, payload }) {
+        return new Promise((resolve, reject) => {
+            this.client.put(priority, delay, 0, JSON.stringify(payload), (err, jobid) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(jobid);
+                }
+            })
+        })
+    }
+    delete (jobid) {
+        return new Promise((resolve, reject) => {
+            this.client.destroy(jobid, (err) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            })
+        })
+    }
     quit () {
         return new Promise((resolve, reject) => {
             this.client

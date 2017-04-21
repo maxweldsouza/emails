@@ -21,3 +21,17 @@ test('Can use tube', async () => {
     expect(tubename).toBe('test_fivebeans_wrapper');
     await fb.quit();
 });
+
+describe('Can put and delete jobs', () => {
+    let fb = new FiveBeans();
+    beforeEach(async () => {
+        await fb.connect();
+    })
+    test('Can put job', async () => {
+        let jobid = await fb.put({ priority: 0, delay: 0, payload: { 'hello': 'world' }});
+        await fb.delete (jobid);
+    });
+    afterEach(async () => {
+        await fb.quit();
+    })
+});
