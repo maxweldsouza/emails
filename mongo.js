@@ -11,10 +11,10 @@ export default class Mail {
     	db.close();
         return res.insertedId;
     }
-    async send_attempt({vendor, timestamp}) {
+    async send_attempt({id, vendor, timestamp}) {
     	let db = await MongoClient.connect(this.url);
     	await db.collection(this.collection).updateOne(
-    		{_id: new ObjectID('58f9fb5750364a4b7ba89b1d')},
+    		{_id: new ObjectID(id)},
     		{
     			$set: {
     				attempts: [
