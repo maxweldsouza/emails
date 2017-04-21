@@ -7,8 +7,8 @@ test('Save mail to mongodb', async () => {
 		from: 'source@domain.com',
 		subject: 'Test subject'
 	};
-	await save(payload);
-    await _danger_clear_collection();
+	let id = await save(payload);
+    expect(id).toBeTruthy();
 });
 
 test('Add send attempt', async () => {

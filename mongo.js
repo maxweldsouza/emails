@@ -4,8 +4,9 @@ const url = 'mongodb://localhost:27017/test';
 
 export async function save(mail) {
 	let db = await MongoClient.connect(url);
-	db.collection('mails').insertOne(mail);
+	let res = await db.collection('mails').insertOne(mail);
 	db.close();
+    return res.insertedId;
 }
 
 export async function send_attempt({vendor, timestamp}) {
