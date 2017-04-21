@@ -38,6 +38,19 @@ test('Can watch tube', async () => {
     await fb.quit();
 });
 
+test('Clear tube deletes all ready jobs', async () => {
+    let fb = new FiveBeans();
+    try {
+        await fb.connect();
+        await fb.put({ priority: 0, delay: 0, payload: { 'hello': 'world' }});
+        await fb._danger_clear_tube();
+        await fb.peek_ready();
+        await fb.quit();
+    } catch (e) {
+        expect(e).toEqual('NOT_FOUND');
+    }
+});
+
 describe('Can put and delete jobs', () => {
     let fb = new FiveBeans();
     beforeEach(async () => {

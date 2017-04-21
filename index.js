@@ -9,22 +9,11 @@ class Base {
 		this.client = new FiveBeans({hostname, port});
 		this.tube = tube;
 	}
-	async _tubename() {
-        return await this.client.list_tube_used();
-	}
 	async quit() {
         await this.client.quit();
 	}
-    _delete_all_ready () {
-        return new Promise((resolve, reject) => {
-            this.client._delete_all_ready((err) => {
-                if (err) {
-                    reject();
-                } else {
-                    resolve();
-                }
-            })
-        })
+    async _danger_clear_tube () {
+        await this.client._danger_clear_tube();
     }
 }
 

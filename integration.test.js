@@ -21,11 +21,6 @@ describe('Beanstalkd integration', () => {
 		return expect(producer).toBeInstanceOf(Producer);
 	});
 
-	test('Correct tube used', async () => {
-		let tubename = await producer._tubename();
-        expect(tubename).toBe(options.tube);
-	});
-
 	test('Add job to beanstalkd', async () => {
 		await producer.send({message: 'hello'});
 	});
@@ -39,7 +34,7 @@ describe('Beanstalkd integration', () => {
 	});
 
 	afterAll(async () => {
-		await producer._delete_all_ready();
+		await producer._danger_clear_tube();
         await producer.quit();
 	});
 });
