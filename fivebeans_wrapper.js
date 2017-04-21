@@ -94,4 +94,24 @@ export default class FiveBeans {
             this.client.quit();
         })
     }
+    _delete_all_ready(callback) {
+        this.client.peek_ready((err, jobid) => {
+            if (err === 'NOT_FOUND') {
+                callback(null);
+                console.log('All ready jobs deleted');
+            } else if (err) {
+                callback(err);
+                console.error('Could not peek ready jobs', err);
+            } else {
+                this.client.destroy(jobid, error => {
+                    if (error) {
+                        callback(err);
+                        console.error('Could not delete job', error);
+                    } else {
+                        this._delete_all_ready(callback);
+                    }
+                });
+            }
+        });
+    }
 }

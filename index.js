@@ -12,27 +12,20 @@ class Base {
 	async _tubename() {
         return await this.client.list_tube_used();
 	}
-	_delete_all_ready(callback) {
-		this.client.peek_ready((err, jobid) => {
-			if (err === 'NOT_FOUND') {
-				callback();
-				console.log('All ready jobs deleted');
-			} else if (err) {
-				console.error('Could not peek ready jobs', err);
-			} else {
-				this.client.destroy(jobid, error => {
-					if (error) {
-						console.error('Could not delete job', error);
-					} else {
-						this._delete_all_ready(callback);
-					}
-				});
-			}
-		});
-	}
 	async quit() {
         await this.client.quit();
 	}
+    _delete_all_ready () {
+        return new Promise((resolve, reject) => {
+            this.client._delete_all_ready((err) => {
+                if (err) {
+                    reject();
+                } else {
+                    resolve();
+                }
+            })
+        })
+    }
 }
 
 export class Producer extends Base {
