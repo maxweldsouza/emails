@@ -8,12 +8,10 @@ export default class FiveBeans {
         return new Promise((resolve, reject) => {
             this.client
             .on('connect', () => {
-                console.log('Connected')
-                resolve('connected');
+                resolve();
             })
             .on('error', err => {
-                reject('failed');
-                console.error('Couldnt connect to beanstalkd', err);
+                reject(err);
             })
             .connect();
         })
@@ -34,11 +32,9 @@ export default class FiveBeans {
             this.client
             .on('close', () => {
                 resolve();
-                console.log('Beanstalkd connection closed');
             })
             .on('error', err => {
                 reject('failed');
-                console.error('Couldnt disconnect to beanstalkd', err);
             })
             this.client.quit();
         })
