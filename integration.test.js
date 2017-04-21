@@ -14,7 +14,7 @@ describe('Beanstalkd integration', () => {
 		producer = new Producer(options);
 		consumer = new Consumer(options);
 		await producer.connect();
-        await consumer.connect();
+		await consumer.connect();
 	});
 
 	test('Connects to beanstalkd', () => {
@@ -35,6 +35,6 @@ describe('Beanstalkd integration', () => {
 
 	afterAll(async () => {
 		await producer._danger_clear_tube();
-        await producer.quit();
+		await producer.quit();
 	});
 });
