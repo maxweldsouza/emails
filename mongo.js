@@ -1,6 +1,6 @@
 import {ObjectID, MongoClient} from 'mongodb';
 
-export default class Mail {
+export default class MongoDB {
     constructor({url, collection}) {
         this.url = url;
         this.collection = collection;

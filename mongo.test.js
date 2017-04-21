@@ -1,11 +1,11 @@
-import Mail from './mongo';
+import MongoDB from './mongo';
 import {unixTimestamp} from './utils';
 import {ObjectID, MongoClient} from 'mongodb';
 
 const url = 'mongodb://localhost:27017/test';
 
 describe('Mongodb integration', () => {
-    let mail;
+    let mongodb;
     let payload = {
         to: 'something@example.com',
         from: 'source@domain.com',
@@ -13,11 +13,11 @@ describe('Mongodb integration', () => {
     };
 
     beforeAll(() => {
-        mail = new Mail({url, collection: 'mails'});
+        mongodb = new MongoDB({url, collection: 'mails'});
     })
 
     test('Save mail to mongodb', async () => {
-        let id = await mail.save(payload);
+        let id = await mongodb.save(payload);
         expect(id).toBeTruthy();
         let db = await MongoClient.connect(url);
         await db.collection('mails').deleteOne({
@@ -27,8 +27,8 @@ describe('Mongodb integration', () => {
     });
 
     test('Add send attempt', async () => {
-        let id = await mail.save(payload);
-        await mail.send_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
+        let id = await mongodb.save(payload);
+        await mongodb.send_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
 
         let db = await MongoClient.connect(url);
         let item = await db.collection('mails').findOne({
