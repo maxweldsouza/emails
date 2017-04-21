@@ -45,7 +45,7 @@ describe('Mongodb integration', () => {
     test('Set attempt to delivered', async () => {
         let id = await mongodb.save(payload);
         await mongodb.send_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
-        await mongodb.update_attempt({id, timestamp: unixTimestamp()});
+        await mongodb.update_attempt({id, status: 'delivered', timestamp: unixTimestamp()});
 
         let db = await MongoClient.connect(url);
         let item = await db.collection('mails').findOne({

@@ -29,13 +29,13 @@ export default class MongoDB {
     	);
     	db.close();
     }
-    async update_attempt({id, timestamp}) {
+    async update_attempt({id, timestamp, status}) {
         let db = await MongoClient.connect(this.url);
         let item = await db.collection(this.collection).findOne(
             {_id: new ObjectID(id)}
         );
         let last = item.attempts.length-1;
-        item.attempts[last].status = 'delivered';
+        item.attempts[last].status = status;
         await db.collection(this.collection).updateOne(
             {_id: new ObjectID(id)},
             {
