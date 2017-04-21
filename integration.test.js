@@ -10,48 +10,36 @@ describe('Beanstalkd integration', () => {
 		tube: 'test_integration'
 	};
 
-	beforeAll(() => {
+	beforeAll(async () => {
 		producer = new Producer(options);
 		consumer = new Consumer(options);
-		return producer.connect().then(() => {
-			return consumer.connect();
-		});
+		await producer.connect();
+        await consumer.connect();
 	});
 
 	test('Connects to beanstalkd', () => {
 		return expect(producer).toBeInstanceOf(Producer);
 	});
 
-	test('Correct tube used', () => {
-		producer._tubename().then(tubename => {
-			expect(tubename).toBe(options.tube);
-		});
+	test('Correct tube used', async () => {
+		let tubename = await producer._tubename();
+        expect(tubename).toBe(options.tube);
 	});
 
-	test('Add job to beanstalkd', () => {
-		return producer.send({message: 'hello'}).then(connection => {
-			expect(connection).toBeInstanceOf(Producer);
-		});
+	test('Add job to beanstalkd', async () => {
+		await producer.send({message: 'hello'});
 	});
 
-	test('Receive job from beanstalkd', () => {
+	test('Receive job from beanstalkd', async () => {
 		let message = {message: 'hello'};
-		return producer
-			.send(message)
-			.then(() => {
-				return consumer.recieve();
-			})
-			.then(buffer => {
-				let result = JSON.parse(buffer.toString('ascii'));
-				expect(result).toEqual(message);
-			});
+		await producer.send(message);
+		let buffer = await consumer.recieve();
+		let result = JSON.parse(buffer.toString('ascii'));
+		expect(result).toEqual(message);
 	});
 
-	afterAll(done => {
-		producer._delete_all_ready(() => {
-			producer.quit().then(() => {
-				done();
-			});
-		});
+	afterAll(async () => {
+		await producer._delete_all_ready();
+        await producer.quit();
 	});
 });
