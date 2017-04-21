@@ -29,7 +29,7 @@ class Base {
 			} else {
 				this.client.destroy(jobid, error => {
 					if (error) {
-						console.error('Could not delete job', err);
+						console.error('Could not delete job', error);
 					} else {
 						this._delete_all_ready(callback);
 					}
