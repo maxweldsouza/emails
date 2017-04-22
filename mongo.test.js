@@ -1,8 +1,8 @@
 import MongoDB from './mongo';
 import {unixTimestamp} from './utils';
 import {ObjectID, MongoClient} from 'mongodb';
+import * as config from './config.json';
 
-const url = 'mongodb://localhost:27017/test';
 
 describe('Mongodb integration', () => {
     let mongodb;
@@ -14,20 +14,20 @@ describe('Mongodb integration', () => {
     };
 
     beforeAll(() => {
-        mongodb = new MongoDB({url, collection: 'mails'});
+        mongodb = new MongoDB(config.mongodb);
     })
 
     beforeEach( async () => {
-        let db = await MongoClient.connect(url);
-        await db.collection('mails').remove();
+        let db = await MongoClient.connect(config.mongodb.url);
+        await db.collection(config.mongodb.collection).remove();
         db.close();
     })
 
     test('Save mail to mongodb', async () => {
         let id = await mongodb.save(payload);
         expect(id).toBeTruthy();
-        let db = await MongoClient.connect(url);
-        await db.collection('mails').deleteOne({
+        let db = await MongoClient.connect(config.mongodb.url);
+        await db.collection(config.mongodb.collection).deleteOne({
             _id: new ObjectID(id)
         });
         db.close();
@@ -37,13 +37,13 @@ describe('Mongodb integration', () => {
         let id = await mongodb.save(payload);
         await mongodb.send_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
 
-        let db = await MongoClient.connect(url);
-        let item = await db.collection('mails').findOne({
+        let db = await MongoClient.connect(config.mongodb.url);
+        let item = await db.collection(config.mongodb.collection).findOne({
             _id: new ObjectID(id)
         });
         expect(item.attempts.length).toBe(1);
         expect(item.attempts[0].status).toBe('pending');
-        await db.collection('mails').deleteOne({
+        await db.collection(config.mongodb.collection).deleteOne({
             _id: new ObjectID(id)
         });
         db.close();
@@ -54,12 +54,12 @@ describe('Mongodb integration', () => {
         await mongodb.send_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
         await mongodb.update_attempt({id, status: 'delivered', timestamp: unixTimestamp()});
 
-        let db = await MongoClient.connect(url);
-        let item = await db.collection('mails').findOne({
+        let db = await MongoClient.connect(config.mongodb.url);
+        let item = await db.collection(config.mongodb.collection).findOne({
             _id: new ObjectID(id)
         });
         expect(item.attempts[0].status).toBe('delivered');
-        await db.collection('mails').deleteOne({
+        await db.collection(config.mongodb.collection).deleteOne({
             _id: new ObjectID(id)
         });
         db.close();

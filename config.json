@@ -1,0 +1,11 @@
+{
+    "beanstalkd": {
+		"hostname": "127.0.0.1",
+		"port": 11300,
+		"tube": "test_integration"
+	},
+    "mongodb": {
+        "url": "mongodb://localhost:27017/test",
+        "collection": "mails"
+    }
+}

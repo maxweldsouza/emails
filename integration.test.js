@@ -1,18 +1,13 @@
 import {Producer, Consumer} from './index';
 import {ObjectID, MongoClient} from 'mongodb';
 import FiveBeans from './fivebeans_wrapper';
-
-const url = 'mongodb://localhost:27017/test';
+import * as config from './config.json';
 
 describe('Beanstalkd integration', () => {
 	let producer;
 	let consumer;
 
-	let options = {
-		hostname: '127.0.0.1',
-		port: 11300,
-		tube: 'test_integration'
-	};
+	let options = config.beanstalkd;
 
 	beforeAll(async () => {
 		producer = new Producer(options);
@@ -24,8 +19,8 @@ describe('Beanstalkd integration', () => {
     beforeEach(async () => {
         // We clear our mongodb collection and beanstalkd queue before every test
         // so that our tests are isolated from each other
-        let db = await MongoClient.connect(url);
-        await db.collection('mails').remove();
+        let db = await MongoClient.connect(config.mongodb.url);
+        await db.collection(config.mongodb.collection).remove();
         db.close();
 
         let fb = new FiveBeans();

@@ -1,5 +1,6 @@
 import FiveBeans from './fivebeans_wrapper';
 import MongoDB from './mongo';
+import * as config from './config.json';
 
 const DEFAULT_PRIORITY = 1;
 const ZERO_DELAY = 0;
@@ -17,7 +18,7 @@ function validate(payload) {
 class Base {
 	constructor({hostname, port, tube}) {
 		this.beanstalkd = new FiveBeans({hostname, port});
-        this.mongodb = new MongoDB({ url: 'mongodb://localhost:27017/test', collection: 'mails' });
+        this.mongodb = new MongoDB({ url: config.mongodb.url, collection: config.mongodb.collection });
 		this.tube = tube;
 	}
 	async quit() {
