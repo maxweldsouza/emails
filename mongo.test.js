@@ -6,6 +6,7 @@ import * as config from './config.json';
 
 describe('Mongodb integration', () => {
     let mongodb;
+    let db;
     let payload = {
         to: 'something@example.com',
         from: 'source@domain.com',
@@ -14,23 +15,19 @@ describe('Mongodb integration', () => {
     };
     const collection = 'test_mongo_collection'
 
-    beforeAll(() => {
+    beforeAll(async () => {
         mongodb = new MongoDB({url: config.mongodb.url, collection});
+        db = await MongoClient.connect(config.mongodb.url);
     })
 
     beforeEach( async () => {
-        let db = await MongoClient.connect(config.mongodb.url);
         await db.collection(collection).remove();
-        db.close();
     })
 
     test('Save mail to mongodb', async () => {
         let id = await mongodb.save(payload);
         expect(id).toBeTruthy();
         let db = await MongoClient.connect(config.mongodb.url);
-        await db.collection(collection).deleteOne({
-            _id: new ObjectID(id)
-        });
         db.close();
     });
 
@@ -38,16 +35,11 @@ describe('Mongodb integration', () => {
         let id = await mongodb.save(payload);
         await mongodb.send_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
 
-        let db = await MongoClient.connect(config.mongodb.url);
         let item = await db.collection(collection).findOne({
             _id: new ObjectID(id)
         });
         expect(item.attempts.length).toBe(1);
         expect(item.attempts[0].status).toBe('pending');
-        await db.collection(collection).deleteOne({
-            _id: new ObjectID(id)
-        });
-        db.close();
     });
 
     test('Set attempt to delivered', async () => {
@@ -55,14 +47,13 @@ describe('Mongodb integration', () => {
         await mongodb.send_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
         await mongodb.update_attempt({id, status: 'delivered', timestamp: unixTimestamp()});
 
-        let db = await MongoClient.connect(config.mongodb.url);
         let item = await db.collection(collection).findOne({
             _id: new ObjectID(id)
         });
         expect(item.attempts[0].status).toBe('delivered');
-        await db.collection(collection).deleteOne({
-            _id: new ObjectID(id)
-        });
-        db.close();
     });
+
+    afterAll(() => {
+        db.close();
+    })
 });
