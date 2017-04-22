@@ -7,11 +7,10 @@ beforeEach(async () => {
 	await fb.quit();
 });
 
-test('Can use async await', async done => {
+test('Can use async await', async () => {
 	let fb = new FiveBeans();
 	await fb.connect();
 	await fb.quit();
-	return done();
 });
 
 test('Can use promises', () => {
