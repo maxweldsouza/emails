@@ -46,8 +46,7 @@ describe('Beanstalkd integration', () => {
 		let message = {message: 'hello'};
 		await producer.send(message);
 		let {jobid, payload} = await consumer.recieve();
-		let result = JSON.parse(payload.toString('ascii'));
-		expect(result).toMatchObject({message: 'hello'});
+		expect(payload).toMatchObject({message: 'hello'});
 	});
 
 	afterAll(async () => {

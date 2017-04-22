@@ -38,6 +38,15 @@ test('Can watch tube', async () => {
 	await fb.quit();
 });
 
+test('Can reserve job', async () => {
+    let fb = new FiveBeans();
+	await fb.connect();
+	await fb.put({priority: 0, delay: 0, payload: {hello: 'world'}});
+	let result = await fb.reserve();
+    expect(result.payload).toMatchObject({hello: 'world'});
+	await fb.quit();
+});
+
 test('Clear tube deletes all ready jobs', async () => {
 	let fb = new FiveBeans();
 	try {

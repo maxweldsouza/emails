@@ -107,7 +107,10 @@ export default class FiveBeans {
 				if (err) {
 					reject(err);
 				} else {
-					resolve({jobid, payload});
+					resolve({
+                        jobid,
+                        payload: JSON.parse(payload.toString())
+                    });
 				}
 			});
 		});

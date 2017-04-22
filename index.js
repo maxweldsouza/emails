@@ -36,6 +36,7 @@ export class Consumer extends Base {
 		await this.client.watch(this.tube);
 	}
 	async recieve() {
-		return await this.client.reserve();
+		let job = await this.client.reserve();
+        return job;
 	}
 }
