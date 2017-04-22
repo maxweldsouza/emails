@@ -16,37 +16,37 @@ function validate(payload) {
 
 class Base {
 	constructor({hostname, port, tube}) {
-		this.client = new FiveBeans({hostname, port});
+		this.beanstalkd = new FiveBeans({hostname, port});
         this.mongodb = new MongoDB({ url: 'mongodb://localhost:27017/test', collection: 'mails' });
 		this.tube = tube;
 	}
 	async quit() {
-		await this.client.quit();
+		await this.beanstalkd.quit();
 	}
 	async _danger_clear_tube() {
-		await this.client._danger_clear_tube();
+		await this.beanstalkd._danger_clear_tube();
 	}
 }
 
 export class Producer extends Base {
 	async connect() {
-		await this.client.connect();
-		await this.client.use(this.tube);
+		await this.beanstalkd.connect();
+		await this.beanstalkd.use(this.tube);
 	}
 	async send(payload) {
         validate(payload);
         await this.mongodb.save(payload);
-		await this.client.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload});
+		await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload});
 	}
 }
 
 export class Consumer extends Base {
 	async connect() {
-		await this.client.connect();
-		await this.client.watch(this.tube);
+		await this.beanstalkd.connect();
+		await this.beanstalkd.watch(this.tube);
 	}
 	async recieve() {
-		let job = await this.client.reserve();
+		let job = await this.beanstalkd.reserve();
         console.log(job)
         return job;
 	}
