@@ -37,6 +37,7 @@ export class Consumer extends Base {
 	}
 	async recieve() {
 		let job = await this.client.reserve();
+        console.log(job)
         return job;
 	}
 }

@@ -23,16 +23,13 @@ function _delete_all(jobtype, callback) {
 	}
 	peek.bind(this.client)((err, jobid) => {
 		if (err === 'NOT_FOUND') {
-			console.log('All jobs deleted');
 			callback(null);
 		} else if (err) {
-			console.error('Could not peek jobs', err);
 			callback(err);
 		} else {
 			this.client.destroy(jobid, error => {
 				if (error) {
 					callback(err);
-					console.error('Could not job', error);
 				} else {
 					_delete_all.bind(this)(jobtype, callback);
 				}
