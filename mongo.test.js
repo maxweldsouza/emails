@@ -16,6 +16,12 @@ describe('Mongodb integration', () => {
         mongodb = new MongoDB({url, collection: 'mails'});
     })
 
+    beforeEach( async () => {
+        let db = await MongoClient.connect(url);
+        await db.collection('mails').remove();
+        db.close();
+    })
+
     test('Save mail to mongodb', async () => {
         let id = await mongodb.save(payload);
         expect(id).toBeTruthy();

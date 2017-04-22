@@ -1,5 +1,12 @@
 import FiveBeans from './fivebeans_wrapper';
 
+beforeEach(async () => {
+    let fb = new FiveBeans();
+	await fb.connect();
+    await fb._danger_clear_tube();
+	await fb.quit();
+});
+
 test('Can use async await', async done => {
 	let fb = new FiveBeans();
 	await fb.connect();
