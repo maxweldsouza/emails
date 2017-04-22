@@ -9,7 +9,8 @@ describe('Mongodb integration', () => {
     let payload = {
         to: 'something@example.com',
         from: 'source@domain.com',
-        subject: 'Test subject'
+        subject: 'Test subject',
+        body: 'hello'
     };
 
     beforeAll(() => {

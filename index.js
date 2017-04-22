@@ -5,6 +5,15 @@ const DEFAULT_PRIORITY = 1;
 const ZERO_DELAY = 0;
 const TIME_TO_RUN = 10;
 
+function validate(payload) {
+    if (!('to' in payload
+    && 'from' in payload
+    && 'text' in payload
+    && 'subject' in payload))  {
+        throw new Error('Invalid payload');
+    }
+}
+
 class Base {
 	constructor({hostname, port, tube}) {
 		this.client = new FiveBeans({hostname, port});
@@ -25,6 +34,7 @@ export class Producer extends Base {
 		await this.client.use(this.tube);
 	}
 	async send(payload) {
+        validate(payload);
         await this.mongodb.save(payload);
 		await this.client.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload});
 	}

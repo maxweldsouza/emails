@@ -39,14 +39,29 @@ describe('Beanstalkd integration', () => {
 	});
 
 	test('Add job to beanstalkd', async () => {
-		await producer.send({message: 'hello'});
+		await producer.send({
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        });
 	});
 
 	test('Receive job from beanstalkd', async () => {
-		let message = {message: 'hello'};
+		let message = {
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        };
 		await producer.send(message);
 		let {jobid, payload} = await consumer.recieve();
-		expect(payload).toMatchObject({message: 'hello'});
+		expect(payload).toMatchObject({
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        });
 	});
 
 	afterAll(async () => {
