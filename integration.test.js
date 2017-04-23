@@ -2,6 +2,7 @@ import {Producer, Consumer} from './index';
 import {ObjectID, MongoClient} from 'mongodb';
 import FiveBeans from './fivebeans_wrapper';
 import * as config from './config.json';
+import { lastAttemptStatus } from './mongo';
 
 describe('Beanstalkd integration', () => {
 	let producer;
@@ -44,11 +45,6 @@ describe('Beanstalkd integration', () => {
 	test('Add job to beanstalkd', async () => {
 		await producer.send(sample_mail);
 	});
-
-    function lastAttemptStatus (job) {
-        let last = job.attempts.length - 1;
-        return job.attempts[last].status;
-    }
 
     test('Add job to mongodb', async () => {
         await producer.send(sample_mail);

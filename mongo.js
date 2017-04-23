@@ -1,5 +1,11 @@
 import {ObjectID, MongoClient} from 'mongodb';
 
+
+export function lastAttemptStatus (job) {
+    let last = job.attempts.length - 1;
+    return job.attempts[last].status;
+}
+
 export default class MongoDB {
     constructor({url, collection}) {
         this.url = url;
