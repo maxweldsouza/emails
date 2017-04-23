@@ -6,6 +6,7 @@ import {unixTimestamp} from './utils';
 const DEFAULT_PRIORITY = 1;
 const ZERO_DELAY = 0;
 const TIME_TO_RUN = 10;
+const TEN_MINUTES = 10 * 60;
 
 function validate(payload) {
     if (!('to' in payload
@@ -36,9 +37,13 @@ export class Producer extends Base {
 		await this.beanstalkd.use(this.tube);
 	}
 	async send(payload) {
-        validate(payload);
-        let id = await this.mongodb.save(payload);
-		await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload});
+        try {
+            validate(payload);
+            let id = await this.mongodb.save(payload);
+            await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload});
+        } catch (e) {
+            console.error(e);
+        }
 	}
 }
 
@@ -48,8 +53,13 @@ export class Consumer extends Base {
 		await this.beanstalkd.watch(this.tube);
 	}
 	async recieve() {
-		let job = await this.beanstalkd.reserve();
-        await this.mongodb.send_attempt({ id: job.payload._id, vendor: 'amazon', timestamp: unixTimestamp() })
-        return job;
+        try {
+            let job = await this.beanstalkd.reserve();
+            await this.mongodb.send_attempt({ id: job.payload._id, vendor: 'amazon', timestamp: unixTimestamp() })
+            await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload: job.payload})
+            return job;
+        } catch (e) {
+            console.error(e);
+        }
 	}
 }

@@ -50,9 +50,18 @@ describe('Beanstalkd integration', () => {
         await producer.send(sample_mail);
         let {jobid, payload} = await consumer.recieve();
 
-        let item = await db.collection(config.mongodb.collection).findOne();
+        let item = await db.collection(config.mongodb.collection).findOne({_id: new ObjectID(payload._id)});
+        console.log(item)
         expect(item).toMatchObject(sample_mail);
         expect(lastAttemptStatus(item)).toBe('sent');
+    });
+
+    test('Consumer deletes job from beanstalkd after sending mail', async () => {
+        await producer.send(sample_mail);
+        // this will delete the job from beanstalkd and add a new job to check
+        // whether the mail is sent with a higher priority
+        await consumer.recieve();
+        let {jobid, payload} = await consumer.recieve();
     });
 
 	test('Receive job from beanstalkd', async () => {
