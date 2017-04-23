@@ -9,24 +9,25 @@ describe('Beanstalkd integration', () => {
 
 	let options = config.beanstalkd;
 
+    let db;
+    let fb;
+
 	beforeAll(async () => {
 		producer = new Producer(options);
 		consumer = new Consumer(options);
 		await producer.connect();
 		await consumer.connect();
+
+        db = await MongoClient.connect(config.mongodb.url);
+        fb = new FiveBeans();
+        await fb.connect();
 	});
 
     beforeEach(async () => {
         // We clear our mongodb collection and beanstalkd queue before every test
         // so that our tests are isolated from each other
-        let db = await MongoClient.connect(config.mongodb.url);
         await db.collection(config.mongodb.collection).remove();
-        db.close();
-
-        let fb = new FiveBeans();
-        await fb.connect();
         await fb._danger_clear_tube();
-        await fb.quit();
     })
 
 	test('Connects to beanstalkd', () => {
@@ -62,5 +63,8 @@ describe('Beanstalkd integration', () => {
 	afterAll(async () => {
 		await producer._danger_clear_tube();
 		await producer.quit();
+
+        await fb.quit();
+        db.close();
 	});
 });
