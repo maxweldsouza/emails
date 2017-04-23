@@ -46,8 +46,9 @@ describe('Beanstalkd integration', () => {
 		await producer.send(sample_mail);
 	});
 
-    test('Add job to mongodb', async () => {
+    test('Consumer adds job to mongodb', async () => {
         await producer.send(sample_mail);
+        let {jobid, payload} = await consumer.recieve();
 
         let item = await db.collection(config.mongodb.collection).findOne();
         expect(item).toMatchObject(sample_mail);
