@@ -20,7 +20,7 @@ export default class MongoDB {
     				attempts: [
                         {
                             vendor,
-                            status: 'pending',
+                            status: 'sent',
                             timestamp
                         }
                     ]

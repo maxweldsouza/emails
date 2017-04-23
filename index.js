@@ -1,6 +1,7 @@
 import FiveBeans from './fivebeans_wrapper';
 import MongoDB from './mongo';
 import * as config from './config.json';
+import {unixTimestamp} from './utils';
 
 const DEFAULT_PRIORITY = 1;
 const ZERO_DELAY = 0;
@@ -36,7 +37,8 @@ export class Producer extends Base {
 	}
 	async send(payload) {
         validate(payload);
-        await this.mongodb.save(payload);
+        let id = await this.mongodb.save(payload);
+        await this.mongodb.send_attempt({ id, vendor: 'amazon', timestamp: unixTimestamp() })
 		await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload});
 	}
 }

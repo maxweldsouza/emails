@@ -45,11 +45,17 @@ describe('Beanstalkd integration', () => {
 		await producer.send(sample_mail);
 	});
 
+    function lastAttemptStatus (job) {
+        let last = job.attempts.length - 1;
+        return job.attempts[last].status;
+    }
+
     test('Add job to mongodb', async () => {
         await producer.send(sample_mail);
 
         let item = await db.collection(config.mongodb.collection).findOne();
         expect(item).toMatchObject(sample_mail);
+        expect(lastAttemptStatus(item)).toBe('sent');
     });
 
 	test('Receive job from beanstalkd', async () => {

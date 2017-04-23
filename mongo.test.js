@@ -39,7 +39,7 @@ describe('Mongodb integration', () => {
             _id: new ObjectID(id)
         });
         expect(item.attempts.length).toBe(1);
-        expect(item.attempts[0].status).toBe('pending');
+        expect(item.attempts[0].status).toBe('sent');
     });
 
     test('Set attempt to delivered', async () => {
