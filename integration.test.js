@@ -12,6 +12,13 @@ describe('Beanstalkd integration', () => {
     let db;
     let fb;
 
+    let sample_mail = {
+        to: 'something@example.com',
+        from: 'source@domain.com',
+        subject: 'Test subject',
+        text: 'hello'
+    };
+
 	beforeAll(async () => {
 		producer = new Producer(options);
 		consumer = new Consumer(options);
@@ -35,13 +42,15 @@ describe('Beanstalkd integration', () => {
 	});
 
 	test('Add job to beanstalkd', async () => {
-		await producer.send({
-            to: 'something@example.com',
-            from: 'source@domain.com',
-            subject: 'Test subject',
-            text: 'hello'
-        });
+		await producer.send(sample_mail);
 	});
+
+    test('Add job to mongodb', async () => {
+        await producer.send(sample_mail);
+
+        let item = await db.collection(config.mongodb.collection).findOne();
+        expect(item).toMatchObject(sample_mail);
+    });
 
 	test('Receive job from beanstalkd', async () => {
 		let message = {
