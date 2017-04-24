@@ -1,44 +1,5 @@
 import fivebeans from 'fivebeans';
 
-function _delete_jobs_of_type(jobtype) {
-	return new Promise((resolve, reject) => {
-		_delete_all.bind(this)(jobtype, err => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve();
-			}
-		});
-	});
-}
-
-function _delete_all(jobtype, callback) {
-	let peek;
-	if (jobtype == 'ready') {
-		peek = this.client.peek_ready;
-	} else if (jobtype == 'delayed') {
-		peek = this.client.peek_delayed;
-	} else if (jobtype == 'buried') {
-		peek = this.client.peek_buried;
-	}
-	peek.bind(this.client)((err, jobid) => {
-		if (err === 'NOT_FOUND') {
-			callback(null);
-		} else if (err) {
-			callback(err);
-		} else {
-			this.client.destroy(jobid, error => {
-				if (error) {
-					callback(err);
-				} else {
-                    console.log('Deleted job: ', jobid)
-					_delete_all.bind(this)(jobtype, callback);
-				}
-			});
-		}
-	});
-}
-
 export default class FiveBeans {
 	constructor() {
 		this.client = new fivebeans.client('127.0.0.1', 11300);
