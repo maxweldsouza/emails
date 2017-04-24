@@ -1,8 +1,9 @@
 import fivebeans from 'fivebeans';
 
 export default class FiveBeans {
-	constructor() {
-		this.client = new fivebeans.client('127.0.0.1', 11300);
+	constructor({tube, hostname, port}) {
+		this.client = new fivebeans.client(hostname, port);
+        this.tube = tube;
 	}
 	connect() {
 		return new Promise((resolve, reject) => {

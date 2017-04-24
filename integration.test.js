@@ -11,7 +11,7 @@ describe('Beanstalkd integration', () => {
 	let options = config.beanstalkd;
 
     let db;
-    let fb = new FiveBeans();
+    let fb = new FiveBeans(config.beanstalkd);
 
 	beforeAll(async () => {
 		producer = new Producer(options);

@@ -1,21 +1,23 @@
 import FiveBeans from './fivebeans_wrapper';
+import * as config from './config.json';
 
+let {hostname, port, tube} = config.beanstalkd;
 
 test('Can use async await', async () => {
-    let fb = new FiveBeans();
+    let fb = new FiveBeans({hostname, port, tube});
     await fb.connect();
     await fb.quit();
 });
 
 test('Can use promises', () => {
-    let fb = new FiveBeans();
+    let fb = new FiveBeans({hostname, port, tube});
     return fb.connect().then(() => {
         return fb.quit();
     });
 });
 
 test('Clear tube deletes all ready jobs', async () => {
-    let fb = new FiveBeans();
+    let fb = new FiveBeans({hostname, port, tube});
     try {
         await fb.connect();
         await fb.put({priority: 0, delay: 0, payload: {hello: 'world'}});
@@ -37,7 +39,7 @@ describe('Beanstalkd tests', () => {
     });
 
     beforeAll(async () => {
-        fb = new FiveBeans();
+        fb = new FiveBeans({hostname, port, tube});
         await fb.connect();
     })
 
