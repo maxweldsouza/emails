@@ -5,6 +5,22 @@ export function lastAttemptStatus(job) {
 	return job.attempts[last].status;
 }
 
+export function noAttemptsYet (item) {
+    return !('attempts' in item && item.attempts.length > 0);
+}
+
+export function lastMailBounced(item) {
+    return lastAttemptStatus(item) === 'bounced';
+}
+
+export function lastMailNeedsToBeChecked (item) {
+    return lastAttemptStatus(item) === 'pending';
+}
+
+export function lastMailDelivered (item) {
+    return lastAttemptStatus(item) === 'delivered';
+}
+
 export default class MongoDB {
 	constructor({url, collection}) {
 		this.url = url;
@@ -16,6 +32,12 @@ export default class MongoDB {
 		db.close();
 		return res.insertedId;
 	}
+    async get(mongo_id) {
+        let db = await MongoClient.connect(this.url);
+        return await db.collection(this.collection).findOne({
+            _id: mongo_id
+        });
+    }
 	async send_attempt({id, vendor, timestamp}) {
 		let db = await MongoClient.connect(this.url);
 		await db.collection(this.collection).updateOne(

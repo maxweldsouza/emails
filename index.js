@@ -2,6 +2,7 @@ import FiveBeans from './fivebeans_wrapper';
 import MongoDB from './mongo';
 import * as config from './config.json';
 import {unixTimestamp} from './utils';
+import {noAttemptsYet, lastMailBounced, lastMailDelivered, lastMailNeedsToBeChecked} from './mongo';
 
 const DEFAULT_PRIORITY = 0;
 const ZERO_DELAY = 0;
@@ -63,17 +64,37 @@ export class Consumer extends Base {
 	async recieve() {
 		try {
 			let job = await this.beanstalkd.reserve();
-			await this.mongodb.send_attempt({
-				id: job.payload.mongo_id,
-				vendor: 'amazon',
-				timestamp: unixTimestamp()
-			});
-			await this.beanstalkd.put({
-				priority: DEFAULT_PRIORITY,
-				delay: ZERO_DELAY,
-				ttr: TIME_TO_RUN,
-				payload: job.payload
-			});
+            let item = this.mongodb.get(job.payload.mongo_id);
+            if (noAttemptsYet(item)) {
+                await this.mongodb.send_attempt({
+                    id: job.payload.mongo_id,
+                    vendor: 'amazon',
+                    timestamp: unixTimestamp()
+                });
+                await this.beanstalkd.put({
+                    priority: DEFAULT_PRIORITY,
+                    delay: ZERO_DELAY,
+                    ttr: TIME_TO_RUN,
+                    payload: job.payload
+                });
+            } else if (lastMailBounced(item)) {
+                await this.mongodb.send_attempt({
+                    id: job.payload.mongo_id,
+                    vendor: 'amazon',
+                    timestamp: unixTimestamp()
+                });
+                await this.beanstalkd.put({
+                    priority: DEFAULT_PRIORITY,
+                    delay: ZERO_DELAY,
+                    ttr: TIME_TO_RUN,
+                    payload: job.payload
+                });
+            } else if (lastMailNeedsToBeChecked(item)) {
+            } else if (lastMailDelivered(item)) {
+                // Dont do anything
+            } else {
+                throw new Error ('Unexpected state');
+            }
 			await this.beanstalkd.delete(job.jobid);
 			return job;
 		} catch (e) {
