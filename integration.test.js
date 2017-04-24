@@ -3,7 +3,7 @@ import {ObjectID, MongoClient} from 'mongodb';
 import FiveBeans from './fivebeans_wrapper';
 import * as config from './config.json';
 
-describe('Beanstalkd integration', () => {
+describe('Integration tests with beanstalkd and mongodb', () => {
 	let producer;
 	let consumer;
 
@@ -34,7 +34,7 @@ describe('Beanstalkd integration', () => {
 		return expect(producer).toBeInstanceOf(Producer);
 	});
 
-	test('Add job to beanstalkd', async () => {
+	test('Added job should be saved to mongodb', async () => {
 		let {mongo_id} = await producer.send({
 			to: 'something@example.com',
 			from: 'source@domain.com',
@@ -53,7 +53,7 @@ describe('Beanstalkd integration', () => {
 		});
 	});
 
-	test('Receive job from beanstalkd', async () => {
+	test('Received job must only have mongo_id', async () => {
 		let message = {
 			to: 'something@example.com',
 			from: 'source@domain.com',
@@ -65,7 +65,7 @@ describe('Beanstalkd integration', () => {
 		expect(payload.mongo_id.toString()).toEqual(res.mongo_id.toString());
 	});
 
-	test('Consumer adds job to mongodb', async () => {
+	test('Consumer updates mongodb after sending mail', async () => {
 		await producer.send({
 			to: 'something@example.com',
 			from: 'source@domain.com',
