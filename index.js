@@ -3,7 +3,7 @@ import MongoDB from './mongo';
 import * as config from './config.json';
 import {unixTimestamp} from './utils';
 
-const DEFAULT_PRIORITY = 1;
+const DEFAULT_PRIORITY = 0;
 const ZERO_DELAY = 0;
 const TIME_TO_RUN = 10;
 const TEN_MINUTES = 10 * 60;
@@ -40,7 +40,9 @@ export class Producer extends Base {
         try {
             validate(payload);
             let id = await this.mongodb.save(payload);
-            await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload});
+            console.log('Save to mongodb: ', payload);
+            let jobid = await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload});
+            console.log('Added to beanstalkd: ', jobid, payload)
         } catch (e) {
             console.error(e);
         }
@@ -55,8 +57,13 @@ export class Consumer extends Base {
 	async recieve() {
         try {
             let job = await this.beanstalkd.reserve();
+            console.log('Reserved: ', job);
             await this.mongodb.send_attempt({ id: job.payload._id, vendor: 'amazon', timestamp: unixTimestamp() })
+            console.log('Send attempt: ', job)
             await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload: job.payload})
+            console.log('Add to queue again: ', job.payload)
+            await this.beanstalkd.delete(job.jobid);
+            console.log('Delete original job from queue', job)
             return job;
         } catch (e) {
             console.error(e);

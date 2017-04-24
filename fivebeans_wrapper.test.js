@@ -19,6 +19,9 @@ test('Clear tube deletes all ready jobs', async () => {
     try {
         await fb.connect();
         await fb.put({priority: 0, delay: 0, payload: {hello: 'world'}});
+        await fb.put({priority: 0, delay: 0, payload: {hello: 'world'}});
+        await fb.put({priority: 1, delay: 0, payload: {hello: 'world'}});
+        await fb.put({priority: 1, delay: 0, payload: {hello: 'world'}});
         await fb._danger_clear_tube();
         await fb.peek_ready();
         await fb.quit();

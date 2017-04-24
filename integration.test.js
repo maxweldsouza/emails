@@ -11,7 +11,7 @@ describe('Beanstalkd integration', () => {
 	let options = config.beanstalkd;
 
     let db;
-    let fb;
+    let fb = new FiveBeans();
 
     let sample_mail = {
         to: 'something@example.com',
@@ -27,7 +27,6 @@ describe('Beanstalkd integration', () => {
 		await consumer.connect();
 
         db = await MongoClient.connect(config.mongodb.url);
-        fb = new FiveBeans();
         await fb.connect();
 	});
 
@@ -35,6 +34,11 @@ describe('Beanstalkd integration', () => {
         // We clear our mongodb collection and beanstalkd queue before every test
         // so that our tests are isolated from each other
         await db.collection(config.mongodb.collection).remove();
+        await fb.watch(config.beanstalkd.tube);
+        await fb._danger_clear_tube();
+    })
+
+    afterEach(async () => {
         await fb._danger_clear_tube();
     })
 
@@ -43,11 +47,21 @@ describe('Beanstalkd integration', () => {
 	});
 
 	test('Add job to beanstalkd', async () => {
-		await producer.send(sample_mail);
+		await producer.send({
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        });
 	});
 
     test('Consumer adds job to mongodb', async () => {
-        await producer.send(sample_mail);
+        await producer.send({
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        });
         let {jobid, payload} = await consumer.recieve();
 
         let item = await db.collection(config.mongodb.collection).findOne({_id: new ObjectID(payload._id)});
@@ -82,7 +96,6 @@ describe('Beanstalkd integration', () => {
 	});
 
 	afterAll(async () => {
-		await producer._danger_clear_tube();
 		await producer.quit();
 
         await fb.quit();

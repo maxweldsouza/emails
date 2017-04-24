@@ -13,6 +13,7 @@ function _delete_jobs_of_type(jobtype) {
 }
 
 function _delete_all(jobtype, callback) {
+    console.log('Delete all of type: ', jobtype)
 	let peek;
 	if (jobtype == 'ready') {
 		peek = this.client.peek_ready;
@@ -23,6 +24,7 @@ function _delete_all(jobtype, callback) {
 	}
 	peek.bind(this.client)((err, jobid) => {
 		if (err === 'NOT_FOUND') {
+            console.log('No more jobs of type', jobtype)
 			callback(null);
 		} else if (err) {
 			callback(err);
@@ -31,6 +33,7 @@ function _delete_all(jobtype, callback) {
 				if (error) {
 					callback(err);
 				} else {
+                    console.log('Deleted job: ', jobid)
 					_delete_all.bind(this)(jobtype, callback);
 				}
 			});
@@ -89,11 +92,25 @@ export default class FiveBeans {
 	}
 	put({priority, delay, payload}) {
 		return new Promise((resolve, reject) => {
-			this.client.put(priority, delay, 0, JSON.stringify(payload), (err, jobid) => {
+			this.client.put(priority, delay, 30, JSON.stringify(payload), (err, jobid) => {
 				if (err) {
 					reject(err);
 				} else {
 					resolve(jobid);
+				}
+			});
+		});
+	}
+	reserve_with_timeout (seconds) {
+		return new Promise((resolve, reject) => {
+			this.client.reserve_with_timeout(seconds, (err, jobid, payload) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve({
+                        jobid,
+                        payload: JSON.parse(payload.toString())
+                    });
 				}
 			});
 		});
@@ -124,6 +141,7 @@ export default class FiveBeans {
 		});
 	}
 	delete(jobid) {
+        console.log('Deleting jobid ', jobid)
 		return new Promise((resolve, reject) => {
 			this.client.destroy(jobid, err => {
 				if (err) {
@@ -146,9 +164,22 @@ export default class FiveBeans {
 			this.client.quit();
 		});
 	}
-	_danger_clear_tube() {
+	async _danger_clear_tube() {
 		// Use scary names to avoid unintentional use
 		// This is required only for testing
-		return Promise.all([_delete_jobs_of_type.bind(this)('ready'), _delete_jobs_of_type.bind(this)('delayed'), _delete_jobs_of_type.bind(this)('buried')]);
+        console.log('Clearing tube');
+        let result
+        try {
+            result = await this.reserve_with_timeout(0.1);
+            console.log(result.jobid, result.payload)
+            while (result.jobid) {
+                await this.delete(result.jobid);
+                result = await this.reserve_with_timeout(0.1)
+            }
+        } catch (e) {
+            console.log(e);
+            return;
+        }
+		//return Promise.all([_delete_jobs_of_type.bind(this)('ready'), _delete_jobs_of_type.bind(this)('delayed'), _delete_jobs_of_type.bind(this)('buried')]);
 	}
 }
