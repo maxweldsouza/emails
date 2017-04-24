@@ -9,18 +9,18 @@ const TIME_TO_RUN = 10;
 const TEN_MINUTES = 10 * 60;
 
 function validate(payload) {
-    if (!('to' in payload
-    && 'from' in payload
-    && 'text' in payload
-    && 'subject' in payload))  {
-        throw new Error('Invalid payload');
-    }
+	if (!('to' in payload && 'from' in payload && 'text' in payload && 'subject' in payload)) {
+		throw new Error('Invalid payload');
+	}
 }
 
 class Base {
 	constructor({hostname, port, tube}) {
 		this.beanstalkd = new FiveBeans({hostname, port});
-        this.mongodb = new MongoDB({ url: config.mongodb.url, collection: config.mongodb.collection });
+		this.mongodb = new MongoDB({
+			url: config.mongodb.url,
+			collection: config.mongodb.collection
+		});
 		this.tube = tube;
 	}
 	async quit() {
@@ -37,16 +37,21 @@ export class Producer extends Base {
 		await this.beanstalkd.use(this.tube);
 	}
 	async send(payload) {
-        try {
-            validate(payload);
-            let id = await this.mongodb.save(payload);
-            let jobid = await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload: {mongo_id: payload._id}});
-            return {
-                mongo_id: payload._id
-            }
-        } catch (e) {
-            console.error(e);
-        }
+		try {
+			validate(payload);
+			let id = await this.mongodb.save(payload);
+			let jobid = await this.beanstalkd.put({
+				priority: DEFAULT_PRIORITY,
+				delay: ZERO_DELAY,
+				ttr: TIME_TO_RUN,
+				payload: {mongo_id: payload._id}
+			});
+			return {
+				mongo_id: payload._id
+			};
+		} catch (e) {
+			console.error(e);
+		}
 	}
 }
 
@@ -56,14 +61,23 @@ export class Consumer extends Base {
 		await this.beanstalkd.watch(this.tube);
 	}
 	async recieve() {
-        try {
-            let job = await this.beanstalkd.reserve();
-            await this.mongodb.send_attempt({ id: job.payload.mongo_id, vendor: 'amazon', timestamp: unixTimestamp() })
-            await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload: job.payload})
-            await this.beanstalkd.delete(job.jobid);
-            return job;
-        } catch (e) {
-            console.error(e);
-        }
+		try {
+			let job = await this.beanstalkd.reserve();
+			await this.mongodb.send_attempt({
+				id: job.payload.mongo_id,
+				vendor: 'amazon',
+				timestamp: unixTimestamp()
+			});
+			await this.beanstalkd.put({
+				priority: DEFAULT_PRIORITY,
+				delay: ZERO_DELAY,
+				ttr: TIME_TO_RUN,
+				payload: job.payload
+			});
+			await this.beanstalkd.delete(job.jobid);
+			return job;
+		} catch (e) {
+			console.error(e);
+		}
 	}
 }

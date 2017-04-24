@@ -3,7 +3,7 @@ import fivebeans from 'fivebeans';
 export default class FiveBeans {
 	constructor({tube, hostname, port}) {
 		this.client = new fivebeans.client(hostname, port);
-        this.tube = tube;
+		this.tube = tube;
 	}
 	connect() {
 		return new Promise((resolve, reject) => {
@@ -61,16 +61,16 @@ export default class FiveBeans {
 			});
 		});
 	}
-	reserve_with_timeout (seconds) {
+	reserve_with_timeout(seconds) {
 		return new Promise((resolve, reject) => {
 			this.client.reserve_with_timeout(seconds, (err, jobid, payload) => {
 				if (err) {
 					reject(err);
 				} else {
 					resolve({
-                        jobid,
-                        payload: JSON.parse(payload.toString())
-                    });
+						jobid,
+						payload: JSON.parse(payload.toString())
+					});
 				}
 			});
 		});
@@ -82,9 +82,9 @@ export default class FiveBeans {
 					reject(err);
 				} else {
 					resolve({
-                        jobid,
-                        payload: JSON.parse(payload.toString())
-                    });
+						jobid,
+						payload: JSON.parse(payload.toString())
+					});
 				}
 			});
 		});
@@ -126,17 +126,17 @@ export default class FiveBeans {
 	async _danger_clear_tube() {
 		// Use scary names to avoid unintentional use
 		// This is required only for testing
-        let result
-        try {
-            result = await this.reserve_with_timeout(0.1);
-            while (result.jobid) {
-                await this.delete(result.jobid);
-                result = await this.reserve_with_timeout(0.1)
-            }
-        } catch (e) {
-            if (e !== 'TIMED_OUT') {
-                throw e;
-            }
-        }
+		let result;
+		try {
+			result = await this.reserve_with_timeout(0.1);
+			while (result.jobid) {
+				await this.delete(result.jobid);
+				result = await this.reserve_with_timeout(0.1);
+			}
+		} catch (e) {
+			if (e !== 'TIMED_OUT') {
+				throw e;
+			}
+		}
 	}
 }
