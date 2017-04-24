@@ -9,33 +9,6 @@ const ZERO_DELAY = 0;
 const TIME_TO_RUN = 10;
 const TEN_MINUTES = 10 * 60;
 
-function validate(payload) {
-	if (!('to' in payload && 'from' in payload && 'text' in payload && 'subject' in payload)) {
-		throw new Error('Invalid payload');
-	}
-}
-
-export function lastAttemptStatus(job) {
-	let last = job.attempts.length - 1;
-	return job.attempts[last].status;
-}
-
-export function noAttemptsYet (item) {
-    return !('attempts' in item && item.attempts.length > 0);
-}
-
-export function lastMailBounced(item) {
-    return lastAttemptStatus(item) === 'bounced';
-}
-
-export function lastMailNeedsToBeChecked (item) {
-    return lastAttemptStatus(item) === 'sent';
-}
-
-export function lastMailDelivered (item) {
-    return lastAttemptStatus(item) === 'delivered';
-}
-
 class Base {
 	constructor({hostname, port, tube}) {
 		this.beanstalkd = new FiveBeans({hostname, port});
@@ -88,7 +61,7 @@ export class Consumer extends Base {
             vendor: 'amazon',
             timestamp: unixTimestamp()
         });
-        await Amazon.send(item)
+        await Amazon.send(item);
     }
     async addToQueToCheckDelivery (mongo_id) {
         await this.beanstalkd.put({
@@ -129,4 +102,31 @@ export class Consumer extends Base {
 		await this.beanstalkd.delete(job.jobid);
 		return job;
 	}
+}
+
+function validate(payload) {
+	if (!('to' in payload && 'from' in payload && 'text' in payload && 'subject' in payload)) {
+		throw new Error('Invalid payload');
+	}
+}
+
+export function lastAttemptStatus(job) {
+	let last = job.attempts.length - 1;
+	return job.attempts[last].status;
+}
+
+export function noAttemptsYet (item) {
+    return !('attempts' in item && item.attempts.length > 0);
+}
+
+export function lastMailBounced(item) {
+    return lastAttemptStatus(item) === 'bounced';
+}
+
+export function lastMailNeedsToBeChecked (item) {
+    return lastAttemptStatus(item) === 'sent';
+}
+
+export function lastMailDelivered (item) {
+    return lastAttemptStatus(item) === 'delivered';
 }
