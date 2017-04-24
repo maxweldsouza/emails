@@ -61,24 +61,26 @@ export class Consumer extends Base {
 		await this.beanstalkd.connect();
 		await this.beanstalkd.watch(this.tube);
 	}
-    async attemptFirstMailAndSaveToMongo (job) {
+    async attemptFirstMailAndSaveToMongo (mongo_id) {
         await this.mongodb.send_attempt({
-            id: job.payload.mongo_id,
+            id: mongo_id,
             vendor: 'amazon',
             timestamp: unixTimestamp()
         });
     }
-    async addToQueToCheckDelivery (job) {
+    async addToQueToCheckDelivery (mongo_id) {
         await this.beanstalkd.put({
             priority: DEFAULT_PRIORITY,
             delay: ZERO_DELAY,
             ttr: TIME_TO_RUN,
-            payload: job.payload
+            payload: {
+                mongo_id
+            }
         });
     }
-    async makeAnotherAttempt (job) {
+    async makeAnotherAttempt (mongo_id) {
         await this.mongodb.send_attempt({
-            id: job.payload.mongo_id,
+            id: mongo_id,
             vendor: 'amazon',
             timestamp: unixTimestamp()
         });
@@ -86,14 +88,16 @@ export class Consumer extends Base {
 	async recieve() {
 		try {
 			let job = await this.beanstalkd.reserve();
-            let item = this.mongodb.get(job.payload.mongo_id);
+            let mongo_id = job.payload.mongo_id;
+            let item = this.mongodb.get(mongo_id);
+
             if (noAttemptsYet(item)) {
-                await this.attemptFirstMailAndSaveToMongo(job);
-                await this.addToQueToCheckDelivery(job);
+                await this.attemptFirstMailAndSaveToMongo(mongo_id);
+                await this.addToQueToCheckDelivery(mongo_id);
 
             } else if (lastMailBounced(item)) {
-                await this.makeAnotherAttempt(job);
-                await this.addToQueToCheckDelivery(job);
+                await this.makeAnotherAttempt(mongo_id);
+                await this.addToQueToCheckDelivery(mongo_id);
 
             } else if (lastMailNeedsToBeChecked(item)) {
             } else if (lastMailDelivered(item)) {
