@@ -17,7 +17,7 @@ export default class MongoDB {
             _id: mongo_id
         });
     }
-	async send_attempt({id, vendor, timestamp}) {
+	async save_attempt({id, vendor, timestamp}) {
 		let db = await MongoClient.connect(this.url);
 		await db.collection(this.collection).updateOne(
 			{_id: new ObjectID(id)},

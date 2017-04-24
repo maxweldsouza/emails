@@ -82,7 +82,7 @@ export class Consumer extends Base {
 		await this.beanstalkd.watch(this.tube);
 	}
     async attemptFirstMailAndSaveToMongo (mongo_id) {
-        await this.mongodb.send_attempt({
+        await this.mongodb.save_attempt({
             id: mongo_id,
             vendor: 'amazon',
             timestamp: unixTimestamp()
@@ -99,7 +99,7 @@ export class Consumer extends Base {
         });
     }
     async makeAnotherAttempt (mongo_id) {
-        await this.mongodb.send_attempt({
+        await this.mongodb.save_attempt({
             id: mongo_id,
             vendor: 'amazon',
             timestamp: unixTimestamp()
@@ -120,6 +120,7 @@ export class Consumer extends Base {
                 await this.addToQueToCheckDelivery(mongo_id);
 
             } else if (lastMailNeedsToBeChecked(item)) {
+
             } else if (lastMailDelivered(item)) {
                 // Dont do anything
             } else {

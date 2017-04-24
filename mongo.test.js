@@ -32,7 +32,7 @@ describe('Mongodb integration', () => {
 
 	test('Add send attempt', async () => {
 		let id = await mongodb.save(payload);
-		await mongodb.send_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
+		await mongodb.save_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
 
 		let item = await db.collection(collection).findOne({
 			_id: new ObjectID(id)
@@ -43,7 +43,7 @@ describe('Mongodb integration', () => {
 
 	test('Set attempt to delivered', async () => {
 		let id = await mongodb.save(payload);
-		await mongodb.send_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
+		await mongodb.save_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
 		await mongodb.update_attempt({id, status: 'delivered', timestamp: unixTimestamp()});
 
 		let item = await db.collection(collection).findOne({
