@@ -30,14 +30,16 @@ export function prepare({ from, to, text, subject }) {
     };
 }
 
-export function send(mail) {
-    let params = prepare(mail);
-    throw new Error('Dont send mails yet');
-    ses.sendEmail(params, function(err, data) {
-        if (err) {
-            console.log(err, err.stack);
-        } else {
-            console.log(data);
-        }
-    });
+export default {
+    async send(mail) {
+        let params = prepare(mail);
+        console.log('Simulated amazon mail');
+        // ses.sendEmail(params, function(err, data) {
+        //     if (err) {
+        //         console.log(err, err.stack);
+        //     } else {
+        //         console.log(data);
+        //     }
+        // });
+    }
 }

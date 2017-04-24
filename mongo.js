@@ -14,7 +14,7 @@ export default class MongoDB {
     async get(mongo_id) {
         let db = await MongoClient.connect(this.url);
         return await db.collection(this.collection).findOne({
-            _id: mongo_id
+            _id: new ObjectID(mongo_id)
         });
     }
 	async save_attempt({id, vendor, timestamp}) {

@@ -2,6 +2,7 @@ import FiveBeans from './fivebeans_wrapper';
 import MongoDB from './mongo';
 import * as config from './config.json';
 import {unixTimestamp} from './utils';
+import Amazon from './amazon';
 
 const DEFAULT_PRIORITY = 0;
 const ZERO_DELAY = 0;
@@ -28,7 +29,7 @@ export function lastMailBounced(item) {
 }
 
 export function lastMailNeedsToBeChecked (item) {
-    return lastAttemptStatus(item) === 'pending';
+    return lastAttemptStatus(item) === 'sent';
 }
 
 export function lastMailDelivered (item) {
@@ -81,12 +82,13 @@ export class Consumer extends Base {
 		await this.beanstalkd.connect();
 		await this.beanstalkd.watch(this.tube);
 	}
-    async attemptFirstMailAndSaveToMongo (mongo_id) {
+    async attemptFirstMailAndSaveToMongo (mongo_id, item) {
         await this.mongodb.save_attempt({
-            id: mongo_id,
+            id: item._id,
             vendor: 'amazon',
             timestamp: unixTimestamp()
         });
+        await Amazon.send(item)
     }
     async addToQueToCheckDelivery (mongo_id) {
         await this.beanstalkd.put({
@@ -106,30 +108,25 @@ export class Consumer extends Base {
         });
     }
 	async recieve() {
-		try {
-			let job = await this.beanstalkd.reserve();
-            let mongo_id = job.payload.mongo_id;
-            let item = this.mongodb.get(mongo_id);
+		let job = await this.beanstalkd.reserve();
+        let mongo_id = job.payload.mongo_id;
+        let item = await this.mongodb.get(mongo_id);
+        if (noAttemptsYet(item)) {
+            await this.attemptFirstMailAndSaveToMongo(mongo_id, item);
+            await this.addToQueToCheckDelivery(mongo_id);
 
-            if (noAttemptsYet(item)) {
-                await this.attemptFirstMailAndSaveToMongo(mongo_id);
-                await this.addToQueToCheckDelivery(mongo_id);
+        } else if (lastMailBounced(item)) {
+            await this.makeAnotherAttempt(mongo_id);
+            await this.addToQueToCheckDelivery(mongo_id);
 
-            } else if (lastMailBounced(item)) {
-                await this.makeAnotherAttempt(mongo_id);
-                await this.addToQueToCheckDelivery(mongo_id);
+        } else if (lastMailNeedsToBeChecked(item)) {
 
-            } else if (lastMailNeedsToBeChecked(item)) {
-
-            } else if (lastMailDelivered(item)) {
-                // Dont do anything
-            } else {
-                throw new Error ('Unexpected state');
-            }
-			await this.beanstalkd.delete(job.jobid);
-			return job;
-		} catch (e) {
-			console.error(e);
-		}
+        } else if (lastMailDelivered(item)) {
+            // Dont do anything
+        } else {
+            throw new Error ('Unexpected state');
+        }
+		await this.beanstalkd.delete(job.jobid);
+		return job;
 	}
 }
