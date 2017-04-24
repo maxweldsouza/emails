@@ -38,10 +38,6 @@ describe('Beanstalkd integration', () => {
         await fb._danger_clear_tube();
     })
 
-    afterEach(async () => {
-        await fb._danger_clear_tube();
-    })
-
 	test('Connects to beanstalkd', () => {
 		return expect(producer).toBeInstanceOf(Producer);
 	});
@@ -65,7 +61,6 @@ describe('Beanstalkd integration', () => {
         let {jobid, payload} = await consumer.recieve();
 
         let item = await db.collection(config.mongodb.collection).findOne({_id: new ObjectID(payload._id)});
-        console.log(item)
         expect(item).toMatchObject(sample_mail);
         expect(lastAttemptStatus(item)).toBe('sent');
     });
