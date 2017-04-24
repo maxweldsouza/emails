@@ -44,6 +44,23 @@ describe('Beanstalkd integration', () => {
         });
 	});
 
+	test('Receive job from beanstalkd', async () => {
+		let message = {
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        };
+		await producer.send(message);
+		let {jobid, payload} = await consumer.recieve();
+		expect(payload).toMatchObject({
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        });
+	});
+
     test('Consumer adds job to mongodb', async () => {
         await producer.send({
             to: 'something@example.com',
@@ -74,24 +91,8 @@ describe('Beanstalkd integration', () => {
         // whether the mail is sent with a higher priority
         await consumer.recieve();
         let {jobid, payload} = await consumer.recieve();
+        console.log(jobid, payload)
     });
-
-	test('Receive job from beanstalkd', async () => {
-		let message = {
-            to: 'something@example.com',
-            from: 'source@domain.com',
-            subject: 'Test subject',
-            text: 'hello'
-        };
-		await producer.send(message);
-		let {jobid, payload} = await consumer.recieve();
-		expect(payload).toMatchObject({
-            to: 'something@example.com',
-            from: 'source@domain.com',
-            subject: 'Test subject',
-            text: 'hello'
-        });
-	});
 
 	afterAll(async () => {
 		await producer.quit();
