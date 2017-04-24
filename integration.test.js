@@ -13,13 +13,6 @@ describe('Beanstalkd integration', () => {
     let db;
     let fb = new FiveBeans();
 
-    let sample_mail = {
-        to: 'something@example.com',
-        from: 'source@domain.com',
-        subject: 'Test subject',
-        text: 'hello'
-    };
-
 	beforeAll(async () => {
 		producer = new Producer(options);
 		consumer = new Consumer(options);
@@ -61,12 +54,22 @@ describe('Beanstalkd integration', () => {
         let {jobid, payload} = await consumer.recieve();
 
         let item = await db.collection(config.mongodb.collection).findOne({_id: new ObjectID(payload._id)});
-        expect(item).toMatchObject(sample_mail);
+        expect(item).toMatchObject({
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        });
         expect(lastAttemptStatus(item)).toBe('sent');
     });
 
     test('Consumer deletes job from beanstalkd after sending mail', async () => {
-        await producer.send(sample_mail);
+        await producer.send({
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        });
         // this will delete the job from beanstalkd and add a new job to check
         // whether the mail is sent with a higher priority
         await consumer.recieve();
