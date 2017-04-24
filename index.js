@@ -40,7 +40,10 @@ export class Producer extends Base {
         try {
             validate(payload);
             let id = await this.mongodb.save(payload);
-            let jobid = await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload});
+            let jobid = await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload: {mongo_id: payload._id}});
+            return {
+                mongo_id: payload._id
+            }
         } catch (e) {
             console.error(e);
         }
@@ -55,7 +58,7 @@ export class Consumer extends Base {
 	async recieve() {
         try {
             let job = await this.beanstalkd.reserve();
-            await this.mongodb.send_attempt({ id: job.payload._id, vendor: 'amazon', timestamp: unixTimestamp() })
+            await this.mongodb.send_attempt({ id: job.payload.mongo_id, vendor: 'amazon', timestamp: unixTimestamp() })
             await this.beanstalkd.put({priority: DEFAULT_PRIORITY, delay: ZERO_DELAY, ttr: TIME_TO_RUN, payload: job.payload})
             await this.beanstalkd.delete(job.jobid);
             return job;

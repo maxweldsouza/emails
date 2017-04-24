@@ -36,7 +36,17 @@ describe('Beanstalkd integration', () => {
 	});
 
 	test('Add job to beanstalkd', async () => {
-		await producer.send({
+		let { mongo_id } = await producer.send({
+            to: 'something@example.com',
+            from: 'source@domain.com',
+            subject: 'Test subject',
+            text: 'hello'
+        });
+        expect(mongo_id).toBeTruthy();
+        let item = await db.collection(config.mongodb.collection).findOne({
+            _id: mongo_id
+        });
+        expect(item).toMatchObject({
             to: 'something@example.com',
             from: 'source@domain.com',
             subject: 'Test subject',
@@ -51,14 +61,9 @@ describe('Beanstalkd integration', () => {
             subject: 'Test subject',
             text: 'hello'
         };
-		await producer.send(message);
+		let res = await producer.send(message);
 		let {jobid, payload} = await consumer.recieve();
-		expect(payload).toMatchObject({
-            to: 'something@example.com',
-            from: 'source@domain.com',
-            subject: 'Test subject',
-            text: 'hello'
-        });
+		expect(payload.mongo_id.toString()).toEqual(res.mongo_id.toString());
 	});
 
     test('Consumer adds job to mongodb', async () => {
@@ -70,7 +75,7 @@ describe('Beanstalkd integration', () => {
         });
         let {jobid, payload} = await consumer.recieve();
 
-        let item = await db.collection(config.mongodb.collection).findOne({_id: new ObjectID(payload._id)});
+        let item = await db.collection(config.mongodb.collection).findOne({_id: new ObjectID(payload.mongo_id)});
         expect(item).toMatchObject({
             to: 'something@example.com',
             from: 'source@domain.com',
