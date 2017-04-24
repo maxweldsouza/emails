@@ -2,7 +2,6 @@ import FiveBeans from './fivebeans_wrapper';
 import MongoDB from './mongo';
 import * as config from './config.json';
 import {unixTimestamp} from './utils';
-import {noAttemptsYet, lastMailBounced, lastMailDelivered, lastMailNeedsToBeChecked} from './mongo';
 
 const DEFAULT_PRIORITY = 0;
 const ZERO_DELAY = 0;
@@ -13,6 +12,27 @@ function validate(payload) {
 	if (!('to' in payload && 'from' in payload && 'text' in payload && 'subject' in payload)) {
 		throw new Error('Invalid payload');
 	}
+}
+
+export function lastAttemptStatus(job) {
+	let last = job.attempts.length - 1;
+	return job.attempts[last].status;
+}
+
+export function noAttemptsYet (item) {
+    return !('attempts' in item && item.attempts.length > 0);
+}
+
+export function lastMailBounced(item) {
+    return lastAttemptStatus(item) === 'bounced';
+}
+
+export function lastMailNeedsToBeChecked (item) {
+    return lastAttemptStatus(item) === 'pending';
+}
+
+export function lastMailDelivered (item) {
+    return lastAttemptStatus(item) === 'delivered';
 }
 
 class Base {

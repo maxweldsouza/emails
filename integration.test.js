@@ -1,8 +1,7 @@
-import {Producer, Consumer} from './index';
+import {Producer, Consumer, lastAttemptStatus} from './index';
 import {ObjectID, MongoClient} from 'mongodb';
 import FiveBeans from './fivebeans_wrapper';
 import * as config from './config.json';
-import {lastAttemptStatus} from './mongo';
 
 describe('Beanstalkd integration', () => {
 	let producer;
