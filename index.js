@@ -76,6 +76,13 @@ export class Consumer extends Base {
             payload: job.payload
         });
     }
+    async makeAnotherAttempt (job) {
+        await this.mongodb.send_attempt({
+            id: job.payload.mongo_id,
+            vendor: 'amazon',
+            timestamp: unixTimestamp()
+        });
+    }
 	async recieve() {
 		try {
 			let job = await this.beanstalkd.reserve();
@@ -83,18 +90,11 @@ export class Consumer extends Base {
             if (noAttemptsYet(item)) {
                 await this.attemptFirstMailAndSaveToMongo(job);
                 await this.addToQueToCheckDelivery(job);
+
             } else if (lastMailBounced(item)) {
-                await this.mongodb.send_attempt({
-                    id: job.payload.mongo_id,
-                    vendor: 'amazon',
-                    timestamp: unixTimestamp()
-                });
-                await this.beanstalkd.put({
-                    priority: DEFAULT_PRIORITY,
-                    delay: ZERO_DELAY,
-                    ttr: TIME_TO_RUN,
-                    payload: job.payload
-                });
+                await this.makeAnotherAttempt(job);
+                await this.addToQueToCheckDelivery(job);
+
             } else if (lastMailNeedsToBeChecked(item)) {
             } else if (lastMailDelivered(item)) {
                 // Dont do anything
