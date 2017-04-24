@@ -73,12 +73,13 @@ export class Consumer extends Base {
             }
         });
     }
-    async makeAnotherAttempt (mongo_id) {
+    async makeAnotherAttempt (mongo_id, item) {
         await this.mongodb.save_attempt({
             id: mongo_id,
             vendor: 'amazon',
             timestamp: unixTimestamp()
         });
+        await Amazon.send(item);
     }
 	async recieve() {
 		let job = await this.beanstalkd.reserve();
@@ -89,7 +90,7 @@ export class Consumer extends Base {
             await this.addToQueToCheckDelivery(mongo_id);
 
         } else if (lastMailBounced(item)) {
-            await this.makeAnotherAttempt(mongo_id);
+            await this.makeAnotherAttempt(mongo_id, item);
             await this.addToQueToCheckDelivery(mongo_id);
 
         } else if (lastMailNeedsToBeChecked(item)) {
