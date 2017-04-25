@@ -74,3 +74,11 @@ function validate(payload) {
 		throw new Error('Invalid payload');
 	}
 }
+
+
+Amazon.send({
+    from: 'scantuaryindia@gmail.com',
+    to: 'maxellusionist@gmail.com',
+    subject: 'Test',
+    text: 'Hello World'
+})
