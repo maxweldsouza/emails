@@ -11,21 +11,21 @@ export default class MongoDB {
 		db.close();
 		return res.insertedId;
 	}
-    async get(mongo_id) {
-        let db = await MongoClient.connect(this.url);
-        return await db.collection(this.collection).findOne({
-            _id: new ObjectID(mongo_id)
-        });
-    }
+	async get(mongo_id) {
+		let db = await MongoClient.connect(this.url);
+		return await db.collection(this.collection).findOne({
+			_id: new ObjectID(mongo_id)
+		});
+	}
 	async save_attempt({id, vendor, timestamp}) {
 		let db = await MongoClient.connect(this.url);
 		await db.collection(this.collection).updateOne(
 			{_id: new ObjectID(id)},
 			{
 				$set: {
-                    vendor,
-                    status: 'sent',
-                    timestamp
+					vendor,
+					status: 'sent',
+					timestamp
 				}
 			}
 		);

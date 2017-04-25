@@ -82,26 +82,26 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 			from: 'source@domain.com',
 			subject: 'Test subject',
 			text: 'hello',
-            status: 'sent',
-            vendor: 'amazon'
+			status: 'sent',
+			vendor: 'amazon'
 		});
 	});
 
 	test('Consumer deletes job from beanstalkd after sending mail', async () => {
-        try {
-            await producer.send({
-                to: 'something@example.com',
-                from: 'source@domain.com',
-                subject: 'Test subject',
-                text: 'hello'
-            });
-            // this will delete the job from beanstalkd and add a new job to check
-            // whether the mail is sent with a higher priority
-            await consumer.recieve();
-            await fb.peek_ready();
-        } catch (e) {
-            expect(e).toEqual('NOT_FOUND');
-        }
+		try {
+			await producer.send({
+				to: 'something@example.com',
+				from: 'source@domain.com',
+				subject: 'Test subject',
+				text: 'hello'
+			});
+			// this will delete the job from beanstalkd and add a new job to check
+			// whether the mail is sent with a higher priority
+			await consumer.recieve();
+			await fb.peek_ready();
+		} catch (e) {
+			expect(e).toEqual('NOT_FOUND');
+		}
 	});
 
 	afterAll(async () => {

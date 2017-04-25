@@ -55,20 +55,20 @@ export class Consumer extends Base {
 		await this.beanstalkd.connect();
 		await this.beanstalkd.watch(this.tube);
 	}
-    async attemptFirstMailAndSaveToMongo (mongo_id, item) {
-        await this.mongodb.save_attempt({
-            id: item._id,
-            vendor: 'amazon',
-            timestamp: unixTimestamp()
-        });
-        await Amazon.send(item);
-    }
+	async attemptFirstMailAndSaveToMongo (mongo_id, item) {
+		await this.mongodb.save_attempt({
+			id: item._id,
+			vendor: 'amazon',
+			timestamp: unixTimestamp()
+		});
+		await Amazon.send(item);
+	}
 	async recieve() {
 		let job = await this.beanstalkd.reserve();
-        let mongo_id = job.payload.mongo_id;
-        let item = await this.mongodb.get(mongo_id);
+		let mongo_id = job.payload.mongo_id;
+		let item = await this.mongodb.get(mongo_id);
 
-        await this.attemptFirstMailAndSaveToMongo(mongo_id, item);
+		await this.attemptFirstMailAndSaveToMongo(mongo_id, item);
 		await this.beanstalkd.delete(job.jobid);
 		return job;
 	}
