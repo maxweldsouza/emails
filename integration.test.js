@@ -1,5 +1,5 @@
-import {Producer, Consumer, lastAttemptStatus} from './index';
 import {ObjectID, MongoClient} from 'mongodb';
+import {Producer, Consumer} from './index';
 import FiveBeans from './fivebeans_wrapper';
 import * as config from './config.json';
 
@@ -61,8 +61,8 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 			text: 'hello'
 		};
 		let res = await producer.send(message);
-		let {jobid, payload} = await consumer.recieve();
-		expect(payload.mongo_id.toString()).toEqual(res.mongo_id.toString());
+		let job = await consumer.recieve();
+		expect(job.payload.mongo_id.toString()).toEqual(res.mongo_id.toString());
 	});
 
 	test('Consumer updates mongodb after sending mail', async () => {
@@ -72,10 +72,10 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 			subject: 'Test subject',
 			text: 'hello'
 		});
-		let {jobid, payload} = await consumer.recieve();
+		let job = await consumer.recieve();
 
 		let item = await db.collection(config.mongodb.collection).findOne({
-			_id: new ObjectID(payload.mongo_id)
+			_id: new ObjectID(job.payload.mongo_id)
 		});
 		expect(item).toMatchObject({
 			to: 'something@example.com',

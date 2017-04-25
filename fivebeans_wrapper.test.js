@@ -55,7 +55,7 @@ describe('Beanstalkd tests', () => {
 	});
 
 	test('Can watch tube', async () => {
-		let tubename = await fb.watch('test_fivebeans_wrapper');
+		await fb.watch('test_fivebeans_wrapper');
 	});
 
 	test('Can reserve job', async () => {

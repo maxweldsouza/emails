@@ -7,7 +7,6 @@ import Amazon from './amazon';
 const DEFAULT_PRIORITY = 0;
 const ZERO_DELAY = 0;
 const TIME_TO_RUN = 10;
-const TEN_MINUTES = 10 * 60;
 
 class Base {
 	constructor({hostname, port, tube}) {
@@ -32,21 +31,17 @@ export class Producer extends Base {
 		await this.beanstalkd.use(this.tube);
 	}
 	async send(payload) {
-		try {
-			validate(payload);
-			let id = await this.mongodb.save(payload);
-			let jobid = await this.beanstalkd.put({
-				priority: DEFAULT_PRIORITY,
-				delay: ZERO_DELAY,
-				ttr: TIME_TO_RUN,
-				payload: {mongo_id: payload._id}
-			});
-			return {
-				mongo_id: payload._id
-			};
-		} catch (e) {
-			console.error(e);
-		}
+		validate(payload);
+		let id = await this.mongodb.save(payload);
+		await this.beanstalkd.put({
+			priority: DEFAULT_PRIORITY,
+			delay: ZERO_DELAY,
+			ttr: TIME_TO_RUN,
+			payload: {mongo_id: id}
+		});
+		return {
+			mongo_id: id
+		};
 	}
 }
 
@@ -55,7 +50,7 @@ export class Consumer extends Base {
 		await this.beanstalkd.connect();
 		await this.beanstalkd.watch(this.tube);
 	}
-	async attemptFirstMailAndSaveToMongo (mongo_id, item) {
+	async attemptFirstMailAndSaveToMongo(mongo_id, item) {
 		await this.mongodb.save_attempt({
 			id: item._id,
 			vendor: 'amazon',

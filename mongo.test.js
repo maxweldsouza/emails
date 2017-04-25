@@ -26,8 +26,6 @@ describe('Mongodb integration', () => {
 	test('Save mail to mongodb', async () => {
 		let id = await mongodb.save(payload);
 		expect(id).toBeTruthy();
-		let db = await MongoClient.connect(config.mongodb.url);
-		db.close();
 	});
 
 	test('Add send attempt', async () => {
