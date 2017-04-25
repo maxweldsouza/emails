@@ -56,3 +56,6 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# secret configuration file
+config.json
