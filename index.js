@@ -63,43 +63,12 @@ export class Consumer extends Base {
         });
         await Amazon.send(item);
     }
-    async addToQueToCheckDelivery (mongo_id) {
-        await this.beanstalkd.put({
-            priority: DEFAULT_PRIORITY,
-            delay: ZERO_DELAY,
-            ttr: TIME_TO_RUN,
-            payload: {
-                mongo_id
-            }
-        });
-    }
-    async makeAnotherAttempt (mongo_id, item) {
-        await this.mongodb.save_attempt({
-            id: mongo_id,
-            vendor: 'amazon',
-            timestamp: unixTimestamp()
-        });
-        await Amazon.send(item);
-    }
 	async recieve() {
 		let job = await this.beanstalkd.reserve();
         let mongo_id = job.payload.mongo_id;
         let item = await this.mongodb.get(mongo_id);
-        if (noAttemptsYet(item)) {
-            await this.attemptFirstMailAndSaveToMongo(mongo_id, item);
-            await this.addToQueToCheckDelivery(mongo_id);
 
-        } else if (lastMailBounced(item)) {
-            await this.makeAnotherAttempt(mongo_id, item);
-            await this.addToQueToCheckDelivery(mongo_id);
-
-        } else if (lastMailNeedsToBeChecked(item)) {
-
-        } else if (lastMailDelivered(item)) {
-            // Dont do anything
-        } else {
-            throw new Error ('Unexpected state');
-        }
+        await this.attemptFirstMailAndSaveToMongo(mongo_id, item);
 		await this.beanstalkd.delete(job.jobid);
 		return job;
 	}
@@ -109,25 +78,4 @@ function validate(payload) {
 	if (!('to' in payload && 'from' in payload && 'text' in payload && 'subject' in payload)) {
 		throw new Error('Invalid payload');
 	}
-}
-
-export function lastAttemptStatus(job) {
-	let last = job.attempts.length - 1;
-	return job.attempts[last].status;
-}
-
-export function noAttemptsYet (item) {
-    return !('attempts' in item && item.attempts.length > 0);
-}
-
-export function lastMailBounced(item) {
-    return lastAttemptStatus(item) === 'bounced';
-}
-
-export function lastMailNeedsToBeChecked (item) {
-    return lastAttemptStatus(item) === 'sent';
-}
-
-export function lastMailDelivered (item) {
-    return lastAttemptStatus(item) === 'delivered';
 }

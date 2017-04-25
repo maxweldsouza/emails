@@ -37,19 +37,8 @@ describe('Mongodb integration', () => {
 		let item = await db.collection(collection).findOne({
 			_id: new ObjectID(id)
 		});
-		expect(item.attempts.length).toBe(1);
-		expect(item.attempts[0].status).toBe('sent');
-	});
-
-	test('Set attempt to delivered', async () => {
-		let id = await mongodb.save(payload);
-		await mongodb.save_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
-		await mongodb.update_attempt({id, status: 'delivered', timestamp: unixTimestamp()});
-
-		let item = await db.collection(collection).findOne({
-			_id: new ObjectID(id)
-		});
-		expect(item.attempts[0].status).toBe('delivered');
+		expect(item.status).toBe('sent');
+		expect(item.vendor).toBe('amazon');
 	});
 
 	afterAll(() => {
