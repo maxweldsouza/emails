@@ -1,9 +1,10 @@
 import {ObjectID, MongoClient} from 'mongodb';
+import * as config from './config.json';
 
 export default class MongoDB {
-	constructor({url, collection}) {
-		this.url = url;
-		this.collection = collection;
+	constructor() {
+		this.url = config.mongodb.url;
+		this.collection = config.mongodb.collection;
 	}
 	async save(mail) {
 		let db = await MongoClient.connect(this.url);

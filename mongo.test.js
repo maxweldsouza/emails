@@ -12,10 +12,10 @@ describe('Mongodb integration', () => {
 		subject: 'Test subject',
 		body: 'hello'
 	};
-	const collection = 'test_mongo_collection';
+	const collection = config.mongodb.collection;
 
 	beforeAll(async () => {
-		mongodb = new MongoDB({url: config.mongodb.url, collection});
+		mongodb = new MongoDB();
 		db = await MongoClient.connect(config.mongodb.url);
 	});
 
