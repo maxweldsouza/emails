@@ -7,14 +7,12 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 	let producer;
 	let consumer;
 
-	let options = config.beanstalkd;
-
 	let mongo;
 	let fivebeans;
 
 	beforeAll(async () => {
-		producer = new Producer(options);
-		consumer = new Consumer(options);
+		producer = new Producer();
+		consumer = new Consumer();
 		await producer.connect();
 		await consumer.connect();
 

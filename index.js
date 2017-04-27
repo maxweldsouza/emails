@@ -20,13 +20,13 @@ function selectVendor(jobid) {
 }
 
 class Base {
-	constructor({hostname, port, tube}) {
+	constructor() {
 		this.beanstalkd = new FiveBeans();
 		this.mongodb = new MongoDB({
 			url: config.mongodb.url,
 			collection: config.mongodb.collection
 		});
-		this.tube = tube;
+		this.tube = config.beanstalkd.tube;
 	}
 	async quit() {
 		await this.beanstalkd.quit();
