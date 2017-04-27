@@ -39,7 +39,6 @@ export class Producer extends Base {
 		await this.beanstalkd.use(this.tube);
 	}
 	async send(payload) {
-		console.log(payload);
 		validate(payload);
 		let id = await this.mongodb.save(payload);
 		await this.beanstalkd.put({
@@ -73,12 +72,11 @@ export class Consumer extends Base {
 		let item = await this.mongodb.get(mongo_id);
 
 		let vendor = selectVendor(job.jobid);
-		console.log(vendor.constructor.name);
 		try {
 			await this.sendMailAndSave(vendor, mongo_id, item);
 		} catch (e) {
 			// TODO add to queue again
-			console.log(e);
+			console.error(e);
 		}
 		await this.beanstalkd.delete(job.jobid);
 		return job;
@@ -96,6 +94,5 @@ export async function run_consumer() {
 	await consumer.connect();
 	while (true) {
 		let job = await consumer.recieve();
-		console.log(job);
 	}
 }

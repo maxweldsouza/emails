@@ -40,9 +40,9 @@ class Amazon extends VendorBase {
 	async send(mail) {
 		let params = this.prepare(mail);
 		if (process.env.NODE_ENV === 'production') {
-			this.ses.sendEmail(params, function (err, data) {
-				if (err) {
-					console.log(err, err.stack);
+			this.ses.sendEmail(params, function (e, data) {
+				if (e) {
+					console.error(e);
 				} else {
 					console.log(data);
 				}
