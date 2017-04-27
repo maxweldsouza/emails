@@ -8,20 +8,16 @@ export default class FiveBeans {
 	connect() {
 		return new Promise((resolve, reject) => {
 			this.client
-			.on('connect', () => {
-				resolve();
-			})
-			.on('error', err => {
-				reject(err);
-			})
+			.on('connect', () => resolve())
+			.on('error', e => reject(e))
 			.connect();
 		});
 	}
 	use(tube) {
 		return new Promise((resolve, reject) => {
-			this.client.use(tube, (err, tubename) => {
-				if (err) {
-					reject(err);
+			this.client.use(tube, (e, tubename) => {
+				if (e) {
+					reject(e);
 				} else {
 					resolve(tubename);
 				}
@@ -30,9 +26,9 @@ export default class FiveBeans {
 	}
 	list_tube_used() {
 		return new Promise((resolve, reject) => {
-			this.client.list_tube_used((err, tubename) => {
-				if (err) {
-					reject(err);
+			this.client.list_tube_used((e, tubename) => {
+				if (e) {
+					reject(e);
 				} else {
 					resolve(tubename);
 				}
@@ -41,9 +37,9 @@ export default class FiveBeans {
 	}
 	watch(tube) {
 		return new Promise((resolve, reject) => {
-			this.client.watch(tube, (err, tubename) => {
-				if (err) {
-					reject(err);
+			this.client.watch(tube, (e, tubename) => {
+				if (e) {
+					reject(e);
 				} else {
 					resolve(tubename);
 				}
@@ -52,9 +48,9 @@ export default class FiveBeans {
 	}
 	put({priority, delay, payload}) {
 		return new Promise((resolve, reject) => {
-			this.client.put(priority, delay, 30, JSON.stringify(payload), (err, jobid) => {
-				if (err) {
-					reject(err);
+			this.client.put(priority, delay, 30, JSON.stringify(payload), (e, jobid) => {
+				if (e) {
+					reject(e);
 				} else {
 					resolve(jobid);
 				}
@@ -63,9 +59,9 @@ export default class FiveBeans {
 	}
 	reserve_with_timeout(seconds) {
 		return new Promise((resolve, reject) => {
-			this.client.reserve_with_timeout(seconds, (err, jobid, payload) => {
-				if (err) {
-					reject(err);
+			this.client.reserve_with_timeout(seconds, (e, jobid, payload) => {
+				if (e) {
+					reject(e);
 				} else {
 					resolve({
 						jobid,
@@ -77,9 +73,9 @@ export default class FiveBeans {
 	}
 	reserve() {
 		return new Promise((resolve, reject) => {
-			this.client.reserve((err, jobid, payload) => {
-				if (err) {
-					reject(err);
+			this.client.reserve((e, jobid, payload) => {
+				if (e) {
+					reject(e);
 				} else {
 					resolve({
 						jobid,
@@ -91,9 +87,9 @@ export default class FiveBeans {
 	}
 	peek_ready() {
 		return new Promise((resolve, reject) => {
-			this.client.peek_ready((err, jobid, payload) => {
-				if (err) {
-					reject(err);
+			this.client.peek_ready((e, jobid, payload) => {
+				if (e) {
+					reject(e);
 				} else {
 					resolve({jobid, payload});
 				}
@@ -102,9 +98,9 @@ export default class FiveBeans {
 	}
 	delete(jobid) {
 		return new Promise((resolve, reject) => {
-			this.client.destroy(jobid, err => {
-				if (err) {
-					reject(err);
+			this.client.destroy(jobid, e => {
+				if (e) {
+					reject(e);
 				} else {
 					resolve();
 				}
@@ -114,12 +110,8 @@ export default class FiveBeans {
 	quit() {
 		return new Promise((resolve, reject) => {
 			this.client
-			.on('close', () => {
-				resolve();
-			})
-			.on('error', err => {
-				reject('failed');
-			});
+			.on('close', () => resolve())
+			.on('error', e => reject(e));
 			this.client.quit();
 		});
 	}
