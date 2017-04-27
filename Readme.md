@@ -1,6 +1,7 @@
 # Coding Challenge
 
-Problem: E-mail service
+## Problem:
+E-mail service api
 
 ## Solution:  
 A beanstalkd queue with persistence to mongodb.
@@ -14,12 +15,34 @@ Vendors are selected using round robin based on the jobid of the beanstalkd job.
 Failover:  
 If an email service fails it is marked as unavailable for 10 minutes. The failed job is added to the beanstalkd again with higher priority. This means it will be taken up immediately and sent using another vendor.
 
-Features:
+Tests:  
+Some tests need mongodb and beanstakld running. Tests are run on a specially named mongodb collection and beanstalkd tube so that they do not interfere with the production environment.
+
+Scalability:  
+Multiple consumers can be run as separate processes. This option seems easier to code and maintain. This also seems to [perform better](https://medium.com/@fermads/node-js-process-load-balancing-comparing-cluster-iptables-and-nginx-6746aaf38272). Node's Cluster requires additional code and there is no shared memory between processes.
+
+Dependencies:
+Fivebeans has been selected since it is well tested and popular. A thin wrapper has been written over fivebeans for use with `async await` syntax. This has led to much cleaner code. This also provides isolation agains api changes in fivebeans.
 
 
 ## Usage:  
-Build `npm build`  
-Test `npm t`  
+Configuration:
+A config.json file is required to run. A sample_config.json file has been provided.
+
+### Important Note
+```
+Emails will only be sent when NODE_ENV is set to production otherwise email sending will only be simulated.
+```
+
+Build  
+```
+npm build
+```  
+
+Test  
+```
+npm t
+```  
 
 To run the consumer
 ```
@@ -27,7 +50,7 @@ npm run consumer
 ```  
 
 To use the producer  
-```
+```javascript
 import {Producer} from ...  
 let producer = new Producer();
 await producer.connect();
