@@ -1,6 +1,8 @@
 import fivebeans from 'fivebeans';
 import * as config from './config.json';
 
+const CLEAR_TUBE_RESERVE_TIMEOUT = 0.1;
+
 export default class FiveBeans {
 	constructor() {
 		this.client = new fivebeans.client(config.beanstalkd.hostname, config.beanstalkd.port);
@@ -120,10 +122,10 @@ export default class FiveBeans {
 		// This is required only for testing
 		let result;
 		try {
-			result = await this.reserve_with_timeout(0.1);
+			result = await this.reserve_with_timeout(CLEAR_TUBE_RESERVE_TIMEOUT);
 			while (result.jobid) {
 				await this.delete(result.jobid);
-				result = await this.reserve_with_timeout(0.1);
+				result = await this.reserve_with_timeout(CLEAR_TUBE_RESERVE_TIMEOUT);
 			}
 		} catch (e) {
 			if (e !== 'TIMED_OUT') {
