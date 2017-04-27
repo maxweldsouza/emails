@@ -7,16 +7,12 @@ test('Test amazon request format', () => {
 		subject: 'Test email',
 		text: 'This is the mail body'
 	});
-	expect(result).toEqual({
+	expect(result).toMatchObject({
 		Destination: {
 			ToAddresses: ['something@example.com']
 		},
 		Message: {
 			Body: {
-				Html: {
-					Charset: 'UTF-8',
-					Data: 'This is the message in HTML form.'
-				},
 				Text: {
 					Charset: 'UTF-8',
 					Data: 'This is the mail body'
@@ -27,10 +23,6 @@ test('Test amazon request format', () => {
 				Data: 'Test email'
 			}
 		},
-		ReplyToAddresses: [],
-		ReturnPath: '',
-		ReturnPathArn: '',
-		Source: 'source@example.com',
-		SourceArn: ''
+		Source: 'source@example.com'
 	});
 });
