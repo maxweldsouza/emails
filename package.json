@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js --exec babel-node",
+    "build": "babel src/**.js --out-dir dist",
     "test": "jest"
   },
   "author": "Maxwel Dsouza",
@@ -20,8 +21,7 @@
     "eslint-config-aftership": "^3.3.0",
     "eslint-plugin-jest": "^19.0.1",
     "eslint-plugin-prettier": "^2.0.1",
-    "jest": "^19.0.2",
-    "nodemon": "^1.11.0"
+    "jest": "^19.0.2"
   },
   "dependencies": {
     "aws-sdk": "^2.45.0",
