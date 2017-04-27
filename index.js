@@ -62,7 +62,7 @@ export class Consumer extends Base {
 	async sendMailAndSave(vendor, mongo_id, item) {
 		await this.mongodb.save_attempt({
 			id: item._id,
-			vendor: 'amazon',
+			vendor: vendor.constructor.name,
 			timestamp: unixTimestamp()
 		});
 		await vendor.send(item);
