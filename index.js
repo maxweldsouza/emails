@@ -92,28 +92,11 @@ function validate(payload) {
 	}
 }
 
-let producer = new Producer(config.beanstalkd);
-let consumer = new Consumer(config.beanstalkd);
-
-async function something () {
-	await producer.connect();
-	for (let i = 0; i < 10; i++) {
-		await producer.send({
-			from: 'mail@comparnion.com',
-			to: 'maxellusionist@gmail.com',
-			subject: 'Test mail',
-			text: 'Hi'
-		});
-	}
+export async function run_consumer() {
+	let consumer = new Consumer(config.beanstalkd);
 	await consumer.connect();
 	while (true) {
 		let job = await consumer.recieve();
 		console.log(job);
 	}
 }
-
-something().then(() => {
-})
-.catch((err) => {
-	console.log(err)
-});
