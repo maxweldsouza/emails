@@ -1,3 +1,3 @@
-export function unixTimestamp () {
-    return Math.round(+new Date()/1000);
+export function unixTimestamp() {
+	return Math.round(Number(new Date()) / 1000);
 }

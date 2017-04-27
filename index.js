@@ -77,6 +77,7 @@ export class Consumer extends Base {
 		try {
 			await this.sendMailAndSave(vendor, mongo_id, item);
 		} catch (e) {
+			// TODO add to queue again
 			console.log(e);
 		}
 		await this.beanstalkd.delete(job.jobid);
