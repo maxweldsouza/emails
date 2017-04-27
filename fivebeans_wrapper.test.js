@@ -1,4 +1,5 @@
 import FiveBeans from './fivebeans_wrapper';
+import * as config from './config.json';
 
 test('Can use async await', async () => {
 	let fivebeans = new FiveBeans();
@@ -33,6 +34,8 @@ describe('Beanstalkd tests', () => {
 	let fivebeans;
 	beforeEach(async () => {
 		await fivebeans._danger_clear_tube();
+		await fivebeans.use(config.beanstalkd.tube);
+		await fivebeans.watch(config.beanstalkd.tube);
 	});
 
 	beforeAll(async () => {
@@ -40,20 +43,11 @@ describe('Beanstalkd tests', () => {
 		await fivebeans.connect();
 	});
 
-	test('Can use tube', async () => {
-		let tubename = await fivebeans.use('test_fivebeans_wrapper');
-		expect(tubename).toBe('test_fivebeans_wrapper');
-	});
-
 	test('Can list tube used', async () => {
-		await fivebeans.use('test_fivebeans_wrapper');
 		let tubename = await fivebeans.list_tube_used();
-		expect(tubename).toBe('test_fivebeans_wrapper');
+		expect(tubename).toBe(config.beanstalkd.tube);
 	});
 
-	test('Can watch tube', async () => {
-		await fivebeans.watch('test_fivebeans_wrapper');
-	});
 
 	test('Can reserve job', async () => {
 		await fivebeans.put({priority: 0, delay: 0, payload: {hello: 'world'}});
