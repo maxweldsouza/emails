@@ -1,9 +1,9 @@
 import fivebeans from 'fivebeans';
+import * as config from './config.json';
 
 export default class FiveBeans {
-	constructor({tube, hostname, port}) {
-		this.client = new fivebeans.client(hostname, port);
-		this.tube = tube;
+	constructor() {
+		this.client = new fivebeans.client(config.beanstalkd.hostname, config.beanstalkd.port);
 	}
 	connect() {
 		return new Promise((resolve, reject) => {

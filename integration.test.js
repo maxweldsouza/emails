@@ -20,7 +20,7 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 
 		mongo = await MongoClient.connect(config.mongodb.url);
 
-		fivebeans = new FiveBeans(config.beanstalkd);
+		fivebeans = new FiveBeans();
 		await fivebeans.connect();
 	});
 

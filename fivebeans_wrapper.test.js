@@ -4,20 +4,20 @@ import * as config from './config.json';
 let {hostname, port, tube} = config.beanstalkd;
 
 test('Can use async await', async () => {
-	let fb = new FiveBeans({hostname, port, tube});
+	let fb = new FiveBeans();
 	await fb.connect();
 	await fb.quit();
 });
 
 test('Can use promises', () => {
-	let fb = new FiveBeans({hostname, port, tube});
+	let fb = new FiveBeans();
 	return fb.connect().then(() => {
 		return fb.quit();
 	});
 });
 
 test('Clear tube deletes all ready jobs', async () => {
-	let fb = new FiveBeans({hostname, port, tube});
+	let fb = new FiveBeans();
 	try {
 		await fb.connect();
 		await fb.put({priority: 0, delay: 0, payload: {hello: 'world'}});
@@ -39,7 +39,7 @@ describe('Beanstalkd tests', () => {
 	});
 
 	beforeAll(async () => {
-		fb = new FiveBeans({hostname, port, tube});
+		fb = new FiveBeans();
 		await fb.connect();
 	});
 
