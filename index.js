@@ -5,7 +5,8 @@ import {unixTimestamp} from './utils';
 import Amazon from './amazon';
 import Sparkpost from './sparkpost';
 
-const DEFAULT_PRIORITY = 0;
+const DEFAULT_PRIORITY = 5;
+const RETRY_PRIORITY = 4;
 const ZERO_DELAY = 0;
 const TIME_TO_RUN = 10;
 
@@ -42,7 +43,7 @@ export class Producer extends Base {
 		validate(payload);
 		let id = await this.mongodb.save(payload);
 		await this.beanstalkd.put({
-			priority: DEFAULT_PRIORITY,
+			priority: RETRY_PRIORITY,
 			delay: ZERO_DELAY,
 			ttr: TIME_TO_RUN,
 			payload: {mongo_id: id}
@@ -75,8 +76,13 @@ export class Consumer extends Base {
 		try {
 			await this.sendMailAndSave(vendor, mongo_id, item);
 		} catch (e) {
-			// TODO add to queue again
-			console.error(e);
+            console.error(e);
+            await this.beanstalkd.put({
+    			priority: DEFAULT_PRIORITY,
+    			delay: ZERO_DELAY,
+    			ttr: TIME_TO_RUN,
+    			payload: {mongo_id: id}
+    		});
 		}
 		await this.beanstalkd.delete(job.jobid);
 		return job;
