@@ -41,6 +41,7 @@ export class Producer extends Base {
 		await this.beanstalkd.use(this.tube);
 	}
 	async send(payload) {
+		console.log(payload);
 		validate(payload);
 		let id = await this.mongodb.save(payload);
 		await this.beanstalkd.put({
@@ -66,7 +67,7 @@ export class Consumer extends Base {
 			vendor: 'amazon',
 			timestamp: unixTimestamp()
 		});
-		await Amazon.send(item);
+		await vendor.send(item);
 	}
 	async recieve() {
 		let job = await this.beanstalkd.reserve();
@@ -74,16 +75,11 @@ export class Consumer extends Base {
 		let item = await this.mongodb.get(mongo_id);
 
 		let vendor = selectVendor(job.jobid);
-
+		console.log(vendor.constructor.name);
 		try {
 			await this.sendMailAndSave(vendor, mongo_id, item);
 		} catch (e) {
-			this.beanstalkd.put({
-				priority: DEFAULT_PRIORITY,
-				delay: ZERO_DELAY,
-				ttr: TIME_TO_RUN,
-				payload: {mongo_id: job.payload.mongo_id}
-			});
+			console.log(e);
 		}
 		await this.beanstalkd.delete(job.jobid);
 		return job;
@@ -96,11 +92,28 @@ function validate(payload) {
 	}
 }
 
-console.log(process.env.NODE_ENV);
+let producer = new Producer(config.beanstalkd);
+let consumer = new Consumer(config.beanstalkd);
 
-// Amazon.send({
-//     from: 'scantuaryindia@gmail.com',
-//     to: 'maxellusionist@gmail.com',
-//     subject: 'Test',
-//     text: 'Hello World'
-// })
+async function something () {
+	await producer.connect();
+	for (let i = 0; i < 10; i++) {
+		await producer.send({
+			from: 'mail@comparnion.com',
+			to: 'maxellusionist@gmail.com',
+			subject: 'Test mail',
+			text: 'Hi'
+		});
+	}
+	await consumer.connect();
+	while (true) {
+		let job = await consumer.recieve();
+		console.log(job);
+	}
+}
+
+something().then(() => {
+})
+.catch((err) => {
+	console.log(err)
+});
