@@ -14,7 +14,8 @@ let vendors = [Amazon, Sparkpost];
 function selectVendor(jobid) {
 	let availableVendors = vendors.filter(vendor => vendor.available);
 
-	let vendor = vendors[parseInt(jobid, 10) % availableVendors.length];
+	const radix = 10;
+	let vendor = vendors[parseInt(jobid, radix) % availableVendors.length];
 	return vendor;
 }
 
