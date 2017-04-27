@@ -30,9 +30,6 @@ class Base {
 	async quit() {
 		await this.beanstalkd.quit();
 	}
-	async _danger_clear_tube() {
-		await this.beanstalkd._danger_clear_tube();
-	}
 }
 
 export class Producer extends Base {
