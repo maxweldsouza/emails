@@ -9,8 +9,8 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 
 	let options = config.beanstalkd;
 
-	let db;
-	let fb = new FiveBeans(config.beanstalkd);
+	let mongo;
+	let fivebeans;
 
 	beforeAll(async () => {
 		producer = new Producer(options);
@@ -18,16 +18,16 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 		await producer.connect();
 		await consumer.connect();
 
-		db = await MongoClient.connect(config.mongodb.url);
-		await fb.connect();
+		mongo = await MongoClient.connect(config.mongodb.url);
+
+		fivebeans = new FiveBeans(config.beanstalkd);
+		await fivebeans.connect();
 	});
 
 	beforeEach(async () => {
-		// We clear our mongodb collection and beanstalkd queue before every test
-		// so that our tests are isolated from each other
-		await db.collection(config.mongodb.collection).remove();
-		await fb.watch(config.beanstalkd.tube);
-		await fb._danger_clear_tube();
+		await mongo.collection(config.mongodb.collection).remove();
+		await fivebeans.watch(config.beanstalkd.tube);
+		await fivebeans._danger_clear_tube();
 	});
 
 	test('Connects to beanstalkd', () => {
@@ -42,7 +42,7 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 			text: 'hello'
 		});
 		expect(mongo_id).toBeTruthy();
-		let item = await db.collection(config.mongodb.collection).findOne({
+		let item = await mongo.collection(config.mongodb.collection).findOne({
 			_id: mongo_id
 		});
 		expect(item).toMatchObject({
@@ -74,7 +74,7 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 		});
 		let job = await consumer.recieve();
 
-		let item = await db.collection(config.mongodb.collection).findOne({
+		let item = await mongo.collection(config.mongodb.collection).findOne({
 			_id: new ObjectID(job.payload.mongo_id)
 		});
 		expect(item).toMatchObject({
@@ -95,10 +95,8 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 				subject: 'Test subject',
 				text: 'hello'
 			});
-			// this will delete the job from beanstalkd and add a new job to check
-			// whether the mail is sent with a higher priority
 			await consumer.recieve();
-			await fb.peek_ready();
+			await fivebeans.peek_ready();
 		} catch (e) {
 			expect(e).toEqual('NOT_FOUND');
 		}
@@ -107,7 +105,7 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 	afterAll(async () => {
 		await producer.quit();
 
-		await fb.quit();
-		db.close();
+		await fivebeans.quit();
+		mongo.close();
 	});
 });
