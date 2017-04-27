@@ -3,10 +3,20 @@ import MongoDB from './mongo';
 import * as config from './config.json';
 import {unixTimestamp} from './utils';
 import Amazon from './amazon';
+import Sparkpost from './sparkpost';
 
 const DEFAULT_PRIORITY = 0;
 const ZERO_DELAY = 0;
 const TIME_TO_RUN = 10;
+
+let vendors = [Amazon, Sparkpost];
+
+function selectVendor(jobid) {
+	let availableVendors = vendors.filter(vendor => vendor.available);
+
+	let vendor = vendors[parseInt(jobid, 10) % availableVendors.length];
+	return vendor;
+}
 
 class Base {
 	constructor({hostname, port, tube}) {
@@ -50,7 +60,7 @@ export class Consumer extends Base {
 		await this.beanstalkd.connect();
 		await this.beanstalkd.watch(this.tube);
 	}
-	async attemptFirstMailAndSaveToMongo(mongo_id, item) {
+	async sendMailAndSave(vendor, mongo_id, item) {
 		await this.mongodb.save_attempt({
 			id: item._id,
 			vendor: 'amazon',
@@ -63,7 +73,18 @@ export class Consumer extends Base {
 		let mongo_id = job.payload.mongo_id;
 		let item = await this.mongodb.get(mongo_id);
 
-		await this.attemptFirstMailAndSaveToMongo(mongo_id, item);
+		let vendor = selectVendor(job.jobid);
+
+		try {
+			await this.sendMailAndSave(vendor, mongo_id, item);
+		} catch (e) {
+			this.beanstalkd.put({
+				priority: DEFAULT_PRIORITY,
+				delay: ZERO_DELAY,
+				ttr: TIME_TO_RUN,
+				payload: {mongo_id: job.payload.mongo_id}
+			});
+		}
 		await this.beanstalkd.delete(job.jobid);
 		return job;
 	}
@@ -75,10 +96,11 @@ function validate(payload) {
 	}
 }
 
+console.log(process.env.NODE_ENV);
 
-Amazon.send({
-    from: 'scantuaryindia@gmail.com',
-    to: 'maxellusionist@gmail.com',
-    subject: 'Test',
-    text: 'Hello World'
-})
+// Amazon.send({
+//     from: 'scantuaryindia@gmail.com',
+//     to: 'maxellusionist@gmail.com',
+//     subject: 'Test',
+//     text: 'Hello World'
+// })

@@ -1,28 +1,29 @@
 import fetch from 'node-fetch';
 import * as config from '../config.json';
+import VendorBase from '../vendor_base';
 
-export function prepare({from, to, text, subject}) {
-	return {
-		campaign_id: 'postman_inline_both_example',
-		recipients: [
-			{
-				address: to
+class SparkPost extends VendorBase {
+	prepare({from, to, text, subject}) {
+		return {
+			campaign_id: 'postman_inline_both_example',
+			recipients: [
+				{
+					address: to
+				}
+			],
+			content: {
+				from: {
+					email: from
+				},
+				subject,
+				text
 			}
-		],
-		content: {
-			from: {
-				email: from
-			},
-			subject,
-			text
-		}
-	};
-}
-
-export default {
+		};
+	}
 	async send(mail) {
-		let body = prepare(mail);
+		let body = this.prepare(mail);
 		console.log('Simulated sparkpost mail');
+		return;
 
 		let res = await fetch('https://api.sparkpost.com/api/v1/transmissions?num_rcpt_errors=3', {
 			method: 'POST',
@@ -34,4 +35,7 @@ export default {
 		let json = await res.json();
 		return json;
 	}
-};
+}
+
+const sparkpost = new SparkPost();
+export default sparkpost;

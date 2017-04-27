@@ -1,7 +1,7 @@
-import {prepare} from './index';
+import amazon from './index';
 
 test('Test amazon request format', () => {
-	let result = prepare({
+	let result = amazon.prepare({
 		to: 'something@example.com',
 		from: 'source@example.com',
 		subject: 'Test email',
