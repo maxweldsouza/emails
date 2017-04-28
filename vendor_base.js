@@ -1,6 +1,6 @@
 const _available = Symbol('vendor_availability');
 
-const TEN_MINUTES = 10 * 60 * 1000;
+const TEN_MINUTES_MS = 10 * 60 * 1000;
 
 class VendorBase {
 	constructor() {
@@ -13,7 +13,7 @@ class VendorBase {
 		this[_available] = false;
 		setTimeout(() => {
 			this[_available] = true;
-		}, TEN_MINUTES);
+		}, TEN_MINUTES_MS);
 	}
 }
 

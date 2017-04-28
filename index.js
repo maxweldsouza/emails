@@ -8,7 +8,6 @@ import Sparkpost from './sparkpost';
 const DEFAULT_PRIORITY = 5;
 const RETRY_PRIORITY = 4;
 const ZERO_DELAY = 0;
-const TIME_TO_RUN = 10;
 
 let vendors = [Amazon, Sparkpost];
 
@@ -55,7 +54,6 @@ export class Producer extends Base {
 		await this.beanstalkd.put({
 			priority: RETRY_PRIORITY,
 			delay: ZERO_DELAY,
-			ttr: TIME_TO_RUN,
 			payload: {mongo_id: id}
 		});
 		return {

@@ -1,7 +1,8 @@
 import fivebeans from 'fivebeans';
 import * as config from './config.json';
 
-const CLEAR_TUBE_RESERVE_TIMEOUT = 0.1;
+const CLEAR_TUBE_RESERVE_TIMEOUT_SECS = 0.1;
+const TIME_TO_RUN_SECS = 30;
 
 export default class FiveBeans {
 	constructor() {
@@ -47,7 +48,7 @@ export default class FiveBeans {
 	}
 	put({priority, delay, payload}) {
 		return new Promise((resolve, reject) => {
-			this.client.put(priority, delay, 30, JSON.stringify(payload), (e, jobid) => {
+			this.client.put(priority, delay, TIME_TO_RUN_SECS, JSON.stringify(payload), (e, jobid) => {
 				if (e) {
 					reject(e);
 				} else {
@@ -117,10 +118,10 @@ export default class FiveBeans {
 		// This is required only for testing
 		let result;
 		try {
-			result = await this.reserve_with_timeout(CLEAR_TUBE_RESERVE_TIMEOUT);
+			result = await this.reserve_with_timeout(CLEAR_TUBE_RESERVE_TIMEOUT_SECS);
 			while (result.jobid) {
 				await this.delete(result.jobid);
-				result = await this.reserve_with_timeout(CLEAR_TUBE_RESERVE_TIMEOUT);
+				result = await this.reserve_with_timeout(CLEAR_TUBE_RESERVE_TIMEOUT_SECS);
 			}
 		} catch (e) {
 			if (e !== 'TIMED_OUT') {
