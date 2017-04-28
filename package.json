@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.45.0",
+    "babel-plugin-transform-builtin-extend": "^1.1.2",
     "fivebeans": "^1.5.0",
     "mongodb": "^2.2.26",
     "node-fetch": "^1.6.3"

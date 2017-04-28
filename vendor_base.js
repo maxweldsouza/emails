@@ -5,7 +5,7 @@ const TEN_MINUTES = 10 * 60 * 1000;
 
 class VendorBase {
 	constructor() {
-		this[_available] = true;
+		this[_available] = false;
 	}
 	get available() {
 		return this[_available];

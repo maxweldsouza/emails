@@ -12,8 +12,18 @@ const TIME_TO_RUN = 10;
 
 let vendors = [Amazon, Sparkpost];
 
-function selectVendor(jobid) {
+class NoServiceAvailable extends Error {
+    constructor(...args) {
+        super(...args);
+        Error.captureStackTrace(this, NoServiceAvailable);
+    }
+}
+
+function selectAvailableVendor(jobid) {
 	let availableVendors = vendors.filter(vendor => vendor.available);
+	if (availableVendors.length === 0) {
+		throw new NoServiceAvailable();
+	}
 
 	const radix = 10;
 	let vendor = vendors[parseInt(jobid, radix) % availableVendors.length];
@@ -59,32 +69,33 @@ export class Consumer extends Base {
 		await this.beanstalkd.connect();
 		await this.beanstalkd.watch(this.tube);
 	}
-	async sendMailAndSave(vendor, mongo_id, item) {
-		await this.mongodb.save_attempt({
-			id: item._id,
-			vendor: vendor.constructor.name,
-			timestamp: unixTimestamp()
-		});
-		await vendor.send(item);
+	async sendMailAndSave(mongo_id, item, jobid) {
+		let vendor;
+		try {
+			vendor = selectAvailableVendor(jobid);
+
+			await vendor.send(item);
+			await this.mongodb.save_attempt({
+				id: item.mongo__id,
+				vendor: vendor.constructor.name,
+				timestamp: unixTimestamp()
+			});
+		} catch (e) {
+			if (e instanceof NoServiceAvailable) {
+				throw e;
+			} else {
+				vendor.disableTemporarily();
+				this.sendMailAndSave(mongo_id, item, jobid);
+				console.error(e);
+			}
+		}
 	}
 	async recieve() {
 		let job = await this.beanstalkd.reserve();
 		let mongo_id = job.payload.mongo_id;
 		let item = await this.mongodb.get(mongo_id);
 
-		let vendor = selectVendor(job.jobid);
-		try {
-			await this.sendMailAndSave(vendor, mongo_id, item);
-		} catch (e) {
-            console.error(e);
-			vendor.disableTemporarily();
-            await this.beanstalkd.put({
-    			priority: DEFAULT_PRIORITY,
-    			delay: ZERO_DELAY,
-    			ttr: TIME_TO_RUN,
-    			payload: {mongo_id: mongo_id}
-    		});
-		}
+		await this.sendMailAndSave(mongo_id, item, job.jobid);
 		await this.beanstalkd.delete(job.jobid);
 		return job;
 	}
