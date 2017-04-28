@@ -1,5 +1,4 @@
 import MongoDB from './mongo';
-import {unixTimestamp} from './utils';
 import {ObjectID, MongoClient} from 'mongodb';
 import * as config from './config.json';
 
@@ -30,7 +29,7 @@ describe('Mongodb integration', () => {
 
 	test('Add send attempt', async () => {
 		let id = await mongodb.save(payload);
-		await mongodb.save_attempt({id, vendor: 'amazon', timestamp: unixTimestamp()});
+		await mongodb.save_attempt({id, vendor: 'amazon', timestamp: new Date()});
 
 		let item = await db.collection(collection).findOne({
 			_id: new ObjectID(id)

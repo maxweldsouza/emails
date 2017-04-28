@@ -1,7 +1,6 @@
 import FiveBeans from './fivebeans_wrapper';
 import MongoDB from './mongo';
 import * as config from './config.json';
-import {unixTimestamp} from './utils';
 import Amazon from './amazon';
 import Sparkpost from './sparkpost';
 
@@ -76,7 +75,7 @@ export class Consumer extends Base {
 			await this.mongodb.save_attempt({
 				id: mongo_id,
 				vendor: vendor.constructor.name,
-				timestamp: unixTimestamp()
+				timestamp: new Date()
 			});
 		} catch (e) {
 			if (e instanceof NoServiceAvailable) {
