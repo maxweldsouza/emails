@@ -13,10 +13,10 @@ const TIME_TO_RUN = 10;
 let vendors = [Amazon, Sparkpost];
 
 class NoServiceAvailable extends Error {
-    constructor(...args) {
-        super(...args);
-        Error.captureStackTrace(this, NoServiceAvailable);
-    }
+	constructor(...args) {
+		super(...args);
+		Error.captureStackTrace(this, NoServiceAvailable);
+	}
 }
 
 function selectAvailableVendor(jobid) {

@@ -48,7 +48,6 @@ describe('Beanstalkd tests', () => {
 		expect(tubename).toBe(config.beanstalkd.tube);
 	});
 
-
 	test('Can reserve job', async () => {
 		await fivebeans.put({priority: 0, delay: 0, payload: {hello: 'world'}});
 		let result = await fivebeans.reserve();

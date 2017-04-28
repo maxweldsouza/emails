@@ -9,10 +9,7 @@ export default class FiveBeans {
 	}
 	connect() {
 		return new Promise((resolve, reject) => {
-			this.client
-			.on('connect', () => resolve())
-			.on('error', e => reject(e))
-			.connect();
+			this.client.on('connect', () => resolve()).on('error', e => reject(e)).connect();
 		});
 	}
 	use(tube) {
@@ -111,9 +108,7 @@ export default class FiveBeans {
 	}
 	quit() {
 		return new Promise((resolve, reject) => {
-			this.client
-			.on('close', () => resolve())
-			.on('error', e => reject(e));
+			this.client.on('close', () => resolve()).on('error', e => reject(e));
 			this.client.quit();
 		});
 	}
