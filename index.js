@@ -76,7 +76,7 @@ export class Consumer extends Base {
 
 			await vendor.send(item);
 			await this.mongodb.save_attempt({
-				id: item.mongo__id,
+				id: mongo_id,
 				vendor: vendor.constructor.name,
 				timestamp: unixTimestamp()
 			});
