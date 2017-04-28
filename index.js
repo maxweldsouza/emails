@@ -77,11 +77,12 @@ export class Consumer extends Base {
 			await this.sendMailAndSave(vendor, mongo_id, item);
 		} catch (e) {
             console.error(e);
+			vendor.disableTemporarily();
             await this.beanstalkd.put({
     			priority: DEFAULT_PRIORITY,
     			delay: ZERO_DELAY,
     			ttr: TIME_TO_RUN,
-    			payload: {mongo_id: id}
+    			payload: {mongo_id: mongo_id}
     		});
 		}
 		await this.beanstalkd.delete(job.jobid);

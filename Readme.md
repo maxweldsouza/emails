@@ -7,7 +7,7 @@ E-mail service api
 A beanstalkd queue with persistence to mongodb.
 
 Persistence:  
-When a job is added to a producer it is immediately added to mongodb. Then it is added to the beanstalkd queue. The payload is the id of the object in mongodb. Although beanstalkd has persistence it is good to have the job in mongodb so that data can be looked up easily.
+When a job is added to a producer it's immediately saved to mongodb. Then it's added to the beanstalkd queue. The payload is the id of the object in mongodb. Although beanstalkd has persistence it is good to have the job in mongodb so that data can be looked up easily.
 
 Vendor Selection:  
 Vendors are selected using round robin based on the jobid of the beanstalkd job.
