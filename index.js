@@ -36,15 +36,15 @@ class Base {
 			collection: config.mongodb.collection
 		});
 		this.tube = config.beanstalkd.tube;
-		this.count = 0;
+		this.throughput_count = 0;
 		this.throughput();
 	}
 	throughput() {
-		if (this.start && this.count > 0) {
+		if (this.start && this.throughput_count > 0) {
 			let diff = process.hrtime(this.start);
-			console.log(`${this.constructor.name} throughput is ${this.count / (diff[0] * 1e9 + diff[1]) * 1e9} ops / second`);
+			console.log(`${this.constructor.name} throughput is ${this.throughput_count / (diff[0] * 1e9 + diff[1]) * 1e9} ops / second`);
 		}
-		this.count = 0;
+		this.throughput_count = 0;
 		this.start = process.hrtime();
 		setTimeout(this.throughput.bind(this), MEASURE_THROUGHPUT_MS);
 	}
@@ -69,7 +69,7 @@ export class Producer extends Base {
 			delay: ZERO_DELAY,
 			payload: {mongo_id: id}
 		});
-		this.count++;
+		this.throughput_count++;
 		return {
 			mongo_id: id
 		};
@@ -110,7 +110,7 @@ export class Consumer extends Base {
 		let item = await this.mongodb.get(mongo_id);
 
 		await this.sendMailAndSave(mongo_id, item, job.jobid);
-		this.count++;
+		this.throughput_count++;
 		await this.beanstalkd.delete(job.jobid);
 		return job;
 	}
@@ -136,3 +136,5 @@ export async function run_consumer() {
 		}
 	}
 }
+
+//run_consumer();
