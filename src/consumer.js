@@ -51,8 +51,20 @@ export class Consumer extends Base {
 			}
 		}
 	}
+	run() {
+		this.beanstalkd.reserve().then((job) => {
+			this.process(job);
+			setTimeout(this.run.bind(this), 0);
+		})
+		.catch((e) => {
+			console.error(e);
+		});
+	}
 	async recieve() {
 		let job = await this.beanstalkd.reserve();
+		return await this.process(job);
+	}
+	async process(job) {
 		let mongo_id = job.payload.mongo_id;
 		let item = await this.mongodb.get(mongo_id);
 
@@ -69,18 +81,11 @@ export async function run_consumer() {
 	await consumer.connect();
 	process.on('SIGINT', () => {
 		consumer.close();
-		console.log(`Consumer with PID: ${process.pid} exited`);
+		console.log(`Consumer with PID: ${process.pid} exiting`);
+		process.exit(0);
 	});
 
-	let job = await consumer.recieve();
-	while (job) {
-		try {
-			job = await consumer.recieve();
-		} catch (e) {
-			console.error(e);
-			break;
-		}
-	}
+	consumer.run();
 }
 
 if (require.main === module) {
