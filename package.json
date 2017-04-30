@@ -8,7 +8,7 @@
     "consumer": "node dist/consumer.js",
     "prebuild": "rimraf dist",
     "build": "babel --out-dir dist src --ignore *.test.js --copy-files",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "author": "Maxwel Dsouza",
   "license": "UNLICENSED",
