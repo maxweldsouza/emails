@@ -2,11 +2,12 @@
   "name": "challenge",
   "version": "1.0.0",
   "description": "",
-  "main": "producer.js",
+  "main": "dist/producer.js",
   "scripts": {
-    "start": "babel-node consumer.js",
+    "start": "babel-node src/consumer.js",
     "consumer": "node dist/consumer.js",
-    "build": "babel src/**.js --out-dir dist",
+    "prebuild": "rimraf dist",
+    "build": "babel --out-dir dist src --ignore *.test.js",
     "test": "jest"
   },
   "author": "Maxwel Dsouza",
@@ -22,7 +23,8 @@
     "eslint-config-aftership": "^3.3.0",
     "eslint-plugin-jest": "^19.0.1",
     "eslint-plugin-prettier": "^2.0.1",
-    "jest": "^19.0.2"
+    "jest": "^19.0.2",
+    "rimraf": "^2.6.1"
   },
   "dependencies": {
     "aws-sdk": "^2.45.0",
