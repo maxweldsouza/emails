@@ -39,10 +39,6 @@ Build
 npm build
 ```  
 
-Test  
-```
-npm t
-```  
 
 To run the consumer
 ```
@@ -63,4 +59,19 @@ await producer.send({
 await producer.quit();
 ```
 
-Technical Choices:
+Tests  
+```
+npm t
+```  
+
+Load test
+
+To run the load test start one or more consumers using
+```
+npm run consumer
+```
+
+DON'T run load tests using NODE_ENV=production. Start the load test using.
+```
+npm run loadtest
+```
