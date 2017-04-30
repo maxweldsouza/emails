@@ -79,8 +79,8 @@ export async function run_consumer() {
 	let consumer = new Consumer(config.beanstalkd);
 
 	await consumer.connect();
-	process.on('SIGINT', () => {
-		consumer.close();
+	process.on('SIGINT', async () => {
+		await consumer.close();
 		console.log(`Consumer with PID: ${process.pid} exiting`);
 		process.exit(0);
 	});

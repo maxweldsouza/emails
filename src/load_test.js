@@ -19,11 +19,14 @@ async function process_test() {
 			text: 'Hi'
 		});
 	}
-	await producer.close();
+	process.on('SIGINT', async () => {
+		await producer.close();
+		console.log(`Producer with PID: ${process.pid} exiting`);
+		process.exit(0);
+	});
 }
 
-process_test().then(() => {
-})
-.catch((err) => {
-	console.error(err);
+process_test()
+.catch((e) => {
+	console.error(e);
 });
