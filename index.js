@@ -4,7 +4,6 @@ import * as config from './config.json';
 import Amazon from './amazon';
 import Sparkpost from './sparkpost';
 
-const DEFAULT_PRIORITY = 5;
 const RETRY_PRIORITY = 4;
 const ZERO_DELAY = 0;
 const MEASURE_THROUGHPUT_MS = 1000;
@@ -40,7 +39,7 @@ class Base {
 		this.count = 0;
 		this.throughput();
 	}
-	throughput () {
+	throughput() {
 		if (this.start && this.count > 0) {
 			let diff = process.hrtime(this.start);
 			console.log(`${this.constructor.name} throughput is ${this.count / (diff[0] * 1e9 + diff[1]) * 1e9} ops / second`);
@@ -131,10 +130,9 @@ export async function run_consumer() {
 		try {
 			job = await consumer.recieve();
 		} catch (e) {
-            console.error(e);
+			console.error(e);
 			break;
 		} finally {
-
 		}
 	}
 }
