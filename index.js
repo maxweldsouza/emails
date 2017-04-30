@@ -38,6 +38,7 @@ class Base {
 		});
 		this.tube = config.beanstalkd.tube;
 		this.count = 0;
+		this.throughput();
 	}
 	throughput () {
 		if (this.start && this.count > 0) {
@@ -60,7 +61,6 @@ export class Producer extends Base {
 		await this.beanstalkd.use(this.tube);
 
 		await this.mongodb.connect();
-		this.throughput();
 	}
 	async send(payload) {
 		validate(payload);
@@ -83,7 +83,6 @@ export class Consumer extends Base {
 		await this.beanstalkd.watch(this.tube);
 
 		await this.mongodb.connect();
-		this.throughput();
 	}
 	async sendMailAndSave(mongo_id, item, jobid) {
 		let vendor;
@@ -107,7 +106,7 @@ export class Consumer extends Base {
 		}
 	}
 	async recieve() {
-		let job = await this.beanstalkd.reserve_with_timeout(0.1);
+		let job = await this.beanstalkd.reserve();
 		let mongo_id = job.payload.mongo_id;
 		let item = await this.mongodb.get(mongo_id);
 
