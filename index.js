@@ -38,6 +38,7 @@ class Base {
 		this.tube = config.beanstalkd.tube;
 	}
 	async quit() {
+		await this.mongodb.close();
 		await this.beanstalkd.quit();
 	}
 }
@@ -46,6 +47,8 @@ export class Producer extends Base {
 	async connect() {
 		await this.beanstalkd.connect();
 		await this.beanstalkd.use(this.tube);
+
+		await this.mongodb.connect();
 	}
 	async send(payload) {
 		validate(payload);
@@ -65,6 +68,8 @@ export class Consumer extends Base {
 	async connect() {
 		await this.beanstalkd.connect();
 		await this.beanstalkd.watch(this.tube);
+		
+		await this.mongodb.connect();
 	}
 	async sendMailAndSave(mongo_id, item, jobid) {
 		let vendor;
@@ -88,7 +93,7 @@ export class Consumer extends Base {
 		}
 	}
 	async recieve() {
-		let job = await this.beanstalkd.reserve();
+		let job = await this.beanstalkd.reserve_with_timeout(0.1);
 		let mongo_id = job.payload.mongo_id;
 		let item = await this.mongodb.get(mongo_id);
 
@@ -107,7 +112,15 @@ function validate(payload) {
 export async function run_consumer() {
 	let consumer = new Consumer(config.beanstalkd);
 	await consumer.connect();
-	while (true) {
-		let job = await consumer.recieve();
+	let job = await consumer.recieve();
+	while (job) {
+		try {
+			job = await consumer.recieve();
+		} catch (e) {
+            console.error(e);
+			break;
+		} finally {
+
+		}
 	}
 }

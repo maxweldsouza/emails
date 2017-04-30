@@ -6,21 +6,24 @@ export default class MongoDB {
 		this.url = config.mongodb.url;
 		this.collection = config.mongodb.collection;
 	}
+	async connect() {
+		this.conn = await MongoClient.connect(this.url);
+		this.pipe = this.conn.collection(this.collection);
+	}
+	async close () {
+		this.conn.close();
+	}
 	async save(mail) {
-		let db = await MongoClient.connect(this.url);
-		let res = await db.collection(this.collection).insertOne(mail);
-		db.close();
+		let res = await this.pipe.insertOne(mail);
 		return res.insertedId;
 	}
 	async get(mongo_id) {
-		let db = await MongoClient.connect(this.url);
-		return await db.collection(this.collection).findOne({
+		return await this.pipe.findOne({
 			_id: new ObjectID(mongo_id)
 		});
 	}
 	async save_attempt({id, vendor, timestamp}) {
-		let db = await MongoClient.connect(this.url);
-		await db.collection(this.collection).updateOne(
+		await this.pipe.updateOne(
 			{_id: new ObjectID(id)},
 			{
 				$set: {
@@ -30,6 +33,5 @@ export default class MongoDB {
 				}
 			}
 		);
-		db.close();
 	}
 }

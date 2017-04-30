@@ -15,6 +15,8 @@ describe('Mongodb integration', () => {
 
 	beforeAll(async () => {
 		mongodb = new MongoDB();
+		await mongodb.connect();
+
 		db = await MongoClient.connect(config.mongodb.url);
 	});
 
@@ -39,6 +41,8 @@ describe('Mongodb integration', () => {
 	});
 
 	afterAll(() => {
+		mongodb.close();
+
 		db.close();
 	});
 });

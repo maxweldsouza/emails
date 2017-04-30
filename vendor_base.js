@@ -19,7 +19,7 @@ class VendorBase {
 		if (process.env.NODE_ENV === 'production') {
 			this.send(mail);
 		} else {
-			console.log(`Simulated ${this.constructor.name} mail`);
+			// console.log(`Simulated ${this.constructor.name} mail`);
 			return null;
 		}
 	}
