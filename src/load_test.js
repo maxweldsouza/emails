@@ -13,8 +13,8 @@ async function process_test() {
 	await producer.connect();
 	for (let i = 0; i < count; i++) {
 		await producer.send({
-			from: 'mail@comparnion.com',
-			to: 'maxellusionist@gmail.com',
+			from: 'nothing@example.com',
+			to: 'something@example.com',
 			subject: 'Test mail',
 			text: 'Hi'
 		});
