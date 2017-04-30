@@ -1,4 +1,4 @@
-import {Base} from './index.js';
+import {Base} from './base.js';
 
 const RETRY_PRIORITY = 4;
 const ZERO_DELAY = 0;

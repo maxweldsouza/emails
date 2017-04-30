@@ -1,4 +1,4 @@
-import {Base} from './index.js';
+import {Base} from './base.js';
 import Amazon from './amazon';
 import Sparkpost from './sparkpost';
 import * as config from './config.json';
@@ -63,7 +63,6 @@ export class Consumer extends Base {
 	}
 }
 
-
 export async function run_consumer() {
 	let consumer = new Consumer(config.beanstalkd);
 	await consumer.connect();
@@ -79,4 +78,6 @@ export async function run_consumer() {
 	}
 }
 
-run_consumer();
+if (require.main === module) {
+	run_consumer();
+}
