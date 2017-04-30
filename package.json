@@ -2,9 +2,10 @@
   "name": "challenge",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "producer.js",
   "scripts": {
-    "start": "nodemon index.js --exec babel-node",
+    "start": "babel-node consumer.js",
+    "consumer": "node dist/consumer.js",
     "build": "babel src/**.js --out-dir dist",
     "test": "jest"
   },
