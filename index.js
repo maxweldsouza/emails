@@ -7,6 +7,7 @@ import Sparkpost from './sparkpost';
 const DEFAULT_PRIORITY = 5;
 const RETRY_PRIORITY = 4;
 const ZERO_DELAY = 0;
+const MEASURE_THROUGHPUT_MS = 1000;
 
 let vendors = [Amazon, Sparkpost];
 
@@ -36,6 +37,16 @@ class Base {
 			collection: config.mongodb.collection
 		});
 		this.tube = config.beanstalkd.tube;
+		this.count = 0;
+	}
+	throughput () {
+		if (this.start && this.count > 0) {
+			let diff = process.hrtime(this.start);
+			console.log(`${this.constructor.name} throughput is ${this.count / (diff[0] * 1e9 + diff[1]) * 1e9} ops / second`);
+		}
+		this.count = 0;
+		this.start = process.hrtime();
+		setTimeout(this.throughput.bind(this), MEASURE_THROUGHPUT_MS);
 	}
 	async quit() {
 		await this.mongodb.close();
@@ -49,6 +60,7 @@ export class Producer extends Base {
 		await this.beanstalkd.use(this.tube);
 
 		await this.mongodb.connect();
+		this.throughput();
 	}
 	async send(payload) {
 		validate(payload);
@@ -58,6 +70,7 @@ export class Producer extends Base {
 			delay: ZERO_DELAY,
 			payload: {mongo_id: id}
 		});
+		this.count++;
 		return {
 			mongo_id: id
 		};
@@ -68,8 +81,9 @@ export class Consumer extends Base {
 	async connect() {
 		await this.beanstalkd.connect();
 		await this.beanstalkd.watch(this.tube);
-		
+
 		await this.mongodb.connect();
+		this.throughput();
 	}
 	async sendMailAndSave(mongo_id, item, jobid) {
 		let vendor;
@@ -98,6 +112,7 @@ export class Consumer extends Base {
 		let item = await this.mongodb.get(mongo_id);
 
 		await this.sendMailAndSave(mongo_id, item, job.jobid);
+		this.count++;
 		await this.beanstalkd.delete(job.jobid);
 		return job;
 	}
