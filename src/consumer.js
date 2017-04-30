@@ -73,7 +73,6 @@ export async function run_consumer() {
 		} catch (e) {
 			console.error(e);
 			break;
-		} finally {
 		}
 	}
 }
