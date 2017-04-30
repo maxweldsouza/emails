@@ -30,12 +30,12 @@ export class Consumer extends Base {
 
 		await this.mongodb.connect();
 	}
-	async sendMailAndSave(mongo_id, item, jobid) {
+	async sendMailAndSave(mongo_id, mail, jobid) {
 		let vendor;
 		try {
 			vendor = selectAvailableVendor(jobid);
 
-			await vendor.send_if_production(item);
+			await vendor.send_if_production(mail);
 			await this.mongodb.save_attempt({
 				id: mongo_id,
 				vendor: vendor.constructor.name,
@@ -46,7 +46,7 @@ export class Consumer extends Base {
 				throw e;
 			} else {
 				vendor.disableTemporarily();
-				this.sendMailAndSave(mongo_id, item, jobid);
+				this.sendMailAndSave(mongo_id, mail, jobid);
 				console.error(e);
 			}
 		}
@@ -66,9 +66,9 @@ export class Consumer extends Base {
 	}
 	async process(job) {
 		let mongo_id = job.payload.mongo_id;
-		let item = await this.mongodb.get(mongo_id);
+		let mail = await this.mongodb.get(mongo_id);
 
-		await this.sendMailAndSave(mongo_id, item, job.jobid);
+		await this.sendMailAndSave(mongo_id, mail, job.jobid);
 		this.throughput_count++;
 		await this.beanstalkd.delete(job.jobid);
 		return job;
