@@ -17,9 +17,14 @@ class VendorBase {
 	}
 	async send_if_production(mail) {
 		if (process.env.NODE_ENV === 'production') {
-			this.send(mail);
+			return this.send(mail);
 		} else {
-			// console.log(`Simulated ${this.constructor.name} mail`);
+			// Simulate long network request to make sure jobs are processed asynchronously
+			return new Promise((resolve, reject) => {
+				setTimeout(() => {
+					resolve();
+				}, 200);
+			});
 		}
 	}
 }
