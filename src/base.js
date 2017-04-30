@@ -13,7 +13,9 @@ export class Base {
 		});
 		this.tube = config.beanstalkd.tube;
 		this.throughput_count = 0;
-		this.throughput();
+		if (config.measure_throughput) {
+			this.throughput();
+		}
 	}
 	throughput() {
 		if (this.start && this.throughput_count > 0) {
