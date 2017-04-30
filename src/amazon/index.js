@@ -5,7 +5,11 @@ import VendorBase from '../vendor_base';
 class Amazon extends VendorBase {
 	constructor() {
 		super();
+
+		/* eslint-disable no-unused-vars */
 		let awsconfig = new AWS.Config();
+		/* eslint-enable no-unused-vars */
+
 		AWS.config.update(config.amazon);
 		this.ses = new AWS.SES({apiVersion: '2010-12-01'});
 	}
@@ -47,7 +51,7 @@ class Amazon extends VendorBase {
 					resolve(data);
 				}
 			});
-		})
+		});
 	}
 }
 

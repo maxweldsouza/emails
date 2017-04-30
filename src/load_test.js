@@ -4,7 +4,7 @@ import config from './config.json';
 
 async function process_test() {
 	if (process.env === 'production') {
-		throw new Error('Dont run load test with NODE_ENV=production. Email sending is enabled.')
+		throw new Error('Dont run load test with NODE_ENV=production. Email sending is enabled.');
 	}
 
 	let count = 10000;

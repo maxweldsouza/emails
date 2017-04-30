@@ -1,7 +1,7 @@
 import sparkpost from './index';
 
 test('Test sparkpost request format', () => {
-	let result =sparkpost.prepare({
+	let result = sparkpost.prepare({
 		to: 'something@example.com',
 		from: 'source@example.com',
 		subject: 'Test email',

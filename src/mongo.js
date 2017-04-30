@@ -10,7 +10,7 @@ export default class MongoDB {
 		this.conn = await MongoClient.connect(this.url);
 		this.pipe = this.conn.collection(this.collection);
 	}
-	async close () {
+	async close() {
 		this.conn.close();
 	}
 	async save(mail) {

@@ -20,7 +20,6 @@ class VendorBase {
 			this.send(mail);
 		} else {
 			// console.log(`Simulated ${this.constructor.name} mail`);
-			return null;
 		}
 	}
 }

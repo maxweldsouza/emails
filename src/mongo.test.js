@@ -1,5 +1,5 @@
-import MongoDB from './mongo';
 import {ObjectID, MongoClient} from 'mongodb';
+import MongoDB from './mongo';
 import config from './config.json';
 
 describe('Mongodb integration', () => {
