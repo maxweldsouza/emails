@@ -1,6 +1,6 @@
 import FiveBeans from './fivebeans_wrapper';
 import MongoDB from './mongo';
-import * as config from './config.json';
+import config from './config.json';
 
 const MEASURE_THROUGHPUT_MS = 1000;
 

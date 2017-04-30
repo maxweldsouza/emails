@@ -1,5 +1,5 @@
 import {ObjectID, MongoClient} from 'mongodb';
-import * as config from './config.json';
+import config from './config.json';
 
 export default class MongoDB {
 	constructor() {

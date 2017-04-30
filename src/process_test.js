@@ -1,5 +1,5 @@
 import {Producer, run_consumer} from './index';
-import * as config from './config.json';
+import config from './config.json';
 
 async function process_test() {
 	let producer = new Producer(config.beanstalkd);

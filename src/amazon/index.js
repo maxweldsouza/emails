@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-import * as config from '../config.json';
+import config from '../config.json';
 import VendorBase from '../vendor_base';
 
 class Amazon extends VendorBase {

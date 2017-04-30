@@ -1,5 +1,5 @@
 import fivebeans from 'fivebeans';
-import * as config from './config.json';
+import config from './config.json';
 
 const CLEAR_TUBE_RESERVE_TIMEOUT_SECS = 0.1;
 const TIME_TO_RUN_SECS = 30;

@@ -1,7 +1,7 @@
 import {Base} from './base.js';
 import Amazon from './amazon';
 import Sparkpost from './sparkpost';
-import * as config from './config.json';
+import config from './config.json';
 
 let vendors = [Amazon, Sparkpost];
 

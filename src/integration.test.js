@@ -2,7 +2,7 @@ import {ObjectID, MongoClient} from 'mongodb';
 import {Producer} from './producer';
 import {Consumer} from './consumer';
 import FiveBeans from './fivebeans_wrapper';
-import * as config from './config.json';
+import config from './config.json';
 
 describe('Integration tests with beanstalkd and mongodb', () => {
 	let producer;

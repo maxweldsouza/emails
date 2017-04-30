@@ -1,5 +1,5 @@
 import FiveBeans from './fivebeans_wrapper';
-import * as config from './config.json';
+import config from './config.json';
 
 test('Can use async await', async () => {
 	let fivebeans = new FiveBeans();

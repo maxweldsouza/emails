@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import * as config from '../config.json';
+import config from '../config.json';
 import VendorBase from '../vendor_base';
 
 class SparkPost extends VendorBase {

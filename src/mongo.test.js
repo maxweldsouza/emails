@@ -1,6 +1,6 @@
 import MongoDB from './mongo';
 import {ObjectID, MongoClient} from 'mongodb';
-import * as config from './config.json';
+import config from './config.json';
 
 describe('Mongodb integration', () => {
 	let mongodb;

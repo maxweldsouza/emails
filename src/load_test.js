@@ -1,6 +1,6 @@
 import {Producer} from './producer';
 
-import * as config from './config.json';
+import config from './config.json';
 
 async function process_test() {
 	if (process.env === 'production') {
