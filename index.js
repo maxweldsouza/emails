@@ -18,7 +18,7 @@ export class Base {
 	throughput() {
 		if (this.start && this.throughput_count > 0) {
 			let diff = process.hrtime(this.start);
-			console.log(`${this.constructor.name} throughput is ${this.throughput_count / (diff[0] * 1e9 + diff[1]) * 1e9} ops / second`);
+			console.log(`${this.constructor.name} PID:${process.pid} Throughput: ${this.throughput_count / (diff[0] * 1e9 + diff[1]) * 1e9} ops / second`);
 		}
 		this.throughput_count = 0;
 		this.start = process.hrtime();

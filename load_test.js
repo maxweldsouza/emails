@@ -23,7 +23,6 @@ async function process_test() {
 }
 
 process_test().then(() => {
-	console.log('done')
 })
 .catch((err) => {
 	console.error(err);
