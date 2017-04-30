@@ -102,7 +102,7 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 	});
 
 	afterAll(async () => {
-		await producer.quit();
+		await producer.close();
 
 		await fivebeans.quit();
 		mongo.close();

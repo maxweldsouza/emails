@@ -19,7 +19,7 @@ async function process_test() {
 			text: 'Hi'
 		});
 	}
-	await producer.quit();
+	await producer.close();
 }
 
 process_test().then(() => {

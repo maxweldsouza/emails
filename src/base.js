@@ -26,7 +26,7 @@ export class Base {
 		this.start = process.hrtime();
 		setTimeout(this.throughput.bind(this), MEASURE_THROUGHPUT_MS);
 	}
-	async quit() {
+	async close() {
 		await this.mongodb.close();
 		await this.beanstalkd.quit();
 	}

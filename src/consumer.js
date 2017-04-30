@@ -65,7 +65,13 @@ export class Consumer extends Base {
 
 export async function run_consumer() {
 	let consumer = new Consumer(config.beanstalkd);
+
 	await consumer.connect();
+	process.on('SIGINT', () => {
+		consumer.close();
+		console.log(`Consumer with PID: ${process.pid} exited`);
+	});
+
 	let job = await consumer.recieve();
 	while (job) {
 		try {
