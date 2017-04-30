@@ -15,6 +15,14 @@ class VendorBase {
 			this[_available] = true;
 		}, TEN_MINUTES_MS);
 	}
+	async send_if_production(mail) {
+		if (process.env.NODE_ENV === 'production') {
+			this.send(mail);
+		} else {
+			console.log(`Simulated ${this.constructor.name} mail`);
+			return null;
+		}
+	}
 }
 
 export default VendorBase;

@@ -37,20 +37,17 @@ class Amazon extends VendorBase {
 			SourceArn: ''
 		};
 	}
-	async send(mail) {
+	send(mail) {
 		let params = this.prepare(mail);
-		if (process.env.NODE_ENV === 'production') {
+		return new Promise((resolve, reject) => {
 			this.ses.sendEmail(params, function (e, data) {
 				if (e) {
-					console.error(e);
+					reject(e);
 				} else {
-					console.log(data);
+					resolve(data);
 				}
 			});
-		} else {
-			console.log('Simulated amazon mail');
-			return null;
-		}
+		})
 	}
 }
 

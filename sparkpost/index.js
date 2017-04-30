@@ -22,20 +22,15 @@ class SparkPost extends VendorBase {
 	}
 	async send(mail) {
 		let body = this.prepare(mail);
-		if (process.env.NODE_ENV === 'production') {
-			let res = await fetch('https://api.sparkpost.com/api/v1/transmissions?num_rcpt_errors=3', {
-				method: 'POST',
-				headers: {
-					Authorization: config.sparkpost.key
-				},
-				body
-			});
-			let json = await res.json();
-			return json;
-		} else {
-			console.log('Simulated sparkpost mail');
-			return null;
-		}
+		let res = await fetch('https://api.sparkpost.com/api/v1/transmissions?num_rcpt_errors=3', {
+			method: 'POST',
+			headers: {
+				Authorization: config.sparkpost.key
+			},
+			body
+		});
+		let json = await res.json();
+		return json;
 	}
 }
 

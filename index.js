@@ -71,7 +71,7 @@ export class Consumer extends Base {
 		try {
 			vendor = selectAvailableVendor(jobid);
 
-			await vendor.send(item);
+			await vendor.send_if_production(item);
 			await this.mongodb.save_attempt({
 				id: mongo_id,
 				vendor: vendor.constructor.name,
