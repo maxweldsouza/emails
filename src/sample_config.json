@@ -1,0 +1,26 @@
+{
+    "measure_throughput": true,
+    "beanstalkd": {
+		"hostname": "127.0.0.1",
+		"port": 11300,
+		"tube": "beanstalkd_tube_name"
+	},
+    "mongodb": {
+        "url": "mongodb://localhost:27017/dbname",
+        "collection": "mongo_collection_name"
+    },
+    "amazon": {
+        "region": "us-east-1",
+        "credentials": {
+            "accessKeyId": "",
+            "secretAccessKey": ""
+        }
+    },
+    "mailgun": {
+        "domain": "",
+        "key": ""
+    },
+    "sparkpost": {
+        "key": ""
+    }
+}
