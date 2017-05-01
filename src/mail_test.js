@@ -3,9 +3,7 @@ import mailgun from './mailgun';
 import sendinblue from './sendinblue';
 import sparkpost from './sparkpost';
 
-let vendor = sendinblue;
-
-console.log(process.env.NODE_ENV);
+let vendor = sparkpost;
 
 vendor.send_if_production({
 	from: 'mail@mail.comparnion.com',

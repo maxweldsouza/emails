@@ -5,7 +5,6 @@ import VendorBase from '../vendor_base';
 class SparkPost extends VendorBase {
 	prepare({from, to, text, subject}) {
 		return {
-			campaign_id: 'postman_inline_both_example',
 			recipients: [
 				{
 					address: to

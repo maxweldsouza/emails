@@ -8,7 +8,6 @@ test('Test sparkpost request format', () => {
 		text: 'This is the mail body'
 	});
 	expect(result).toMatchObject({
-		campaign_id: 'postman_inline_both_example',
 		recipients: [
 			{
 				address: 'something@example.com'
