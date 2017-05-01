@@ -5,10 +5,11 @@ import VendorBase from '../vendor_base';
 class SendInBlue extends VendorBase {
 	prepare({from, to, text, subject}) {
 		return {
-			from: [from]
-			to: {to: ""}, // Recipient name
+			from: [from],
+			to: {[to]: ""}, // Recipient name
 			subject,
-			html: text
+			text: text,
+			html: text // Mandatory for send in blue
 		};
 	}
 	async send(mail) {
