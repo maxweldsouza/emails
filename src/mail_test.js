@@ -3,7 +3,7 @@ import mailgun from './mailgun';
 import sendinblue from './sendinblue';
 import sparkpost from './sparkpost';
 
-let vendor = amazon;
+let vendor = mailgun;
 
 console.log(process.env.NODE_ENV);
 
