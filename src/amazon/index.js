@@ -20,10 +20,6 @@ class Amazon extends VendorBase {
 			},
 			Message: {
 				Body: {
-					Html: {
-						Charset: 'UTF-8',
-						Data: 'This is the message in HTML form.'
-					},
 					Text: {
 						Charset: 'UTF-8',
 						Data: text
@@ -34,11 +30,7 @@ class Amazon extends VendorBase {
 					Data: subject
 				}
 			},
-			ReplyToAddresses: [],
-			ReturnPath: '',
-			ReturnPathArn: '',
-			Source: from,
-			SourceArn: ''
+			Source: from
 		};
 	}
 	send(mail) {
