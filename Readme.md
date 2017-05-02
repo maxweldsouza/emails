@@ -111,8 +111,9 @@ await producer.quit();
 
 The load test will add several (10k) jobs to the queue. To run the load test start one or more consumers using
 ```
-npm run consumer
+npm run consumer --test
 ```
+The test flag will ensure that the consumer uses the same tube and database collection that the load testing script uses.
 
 Start the load test using.
 ```

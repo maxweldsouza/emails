@@ -1,3 +1,4 @@
+import minimist from 'minimist';
 import {Base} from './base.js';
 import Amazon from './amazon';
 import Sparkpost from './sparkpost';
@@ -90,5 +91,17 @@ export async function run_consumer(options) {
 }
 
 if (require.main === module) {
-	run_consumer({mongo_config: config.mongo, beanstalkd_config: config.beanstalkd});
+	try {
+		let args = minimist(process.argv.slice(2));
+		let options;
+		if ('test' in args && args.test === true) {
+			options = {mongo_config: config.test.mongodb, beanstalkd_config: config.test.beanstalkd};
+		} else {
+			options = {mongo_config: config.mongodb, beanstalkd_config: config.beanstalkd};
+		}
+		run_consumer(options);
+	} catch (e) {
+		console.error(e.stack);
+		throw e;
+	}
 }
