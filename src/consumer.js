@@ -61,6 +61,7 @@ export class Consumer extends Base {
 		});
 	}
 	async recieve() {
+        // Only for testing
 		let job = await this.beanstalkd.reserve();
 		return await this.process(job);
 	}
