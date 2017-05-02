@@ -2,7 +2,7 @@ import {Producer} from './producer';
 
 import config from './config.json';
 
-async function process_test() {
+async function load_test() {
 	if (process.env === 'production') {
 		throw new Error('Dont run load test with NODE_ENV=production. Email sending is enabled.');
 	}
@@ -29,7 +29,7 @@ async function process_test() {
 	});
 }
 
-process_test()
+load_test()
 .catch((e) => {
 	console.error(e);
 });
