@@ -6,24 +6,23 @@ E-mail service api
 ## Solution:  
 A beanstalkd queue with persistence to mongodb. It consists of a producer and a consumer. The producer is an npm package that can be imported. The consumer can be run directly as a process. Multiple producers and consumers can be run simultaneously. Jobs are added using a producer which adds them to the queue. Consumers process these jobs and send out mails.
 
-Persistence:  
+### Persistence:  
 When a job is added to a producer it's immediately saved to mongodb. Then it's added to the queue. Only the id of the mongodb object is added to the queue. Although beanstalkd has persistence it is good to have the job in mongodb so that data can be looked up easily.
 
-Vendor Selection:  
+### Vendor Selection:  
 Vendors are selected using round robin based on the jobid of the beanstalkd job.
 
-Failover:  
+### Failover:  
 If an email service fails it is marked as unavailable for 10 minutes. The failed job is sent using another vendor.
 
-Tests:  
+### Tests:  
 Some tests need mongodb and beanstakld running. Tests are run on a specially named mongodb collection and beanstalkd tube so that they do not interfere with the production environment.
 
-Scalability:  
-Multiple consumers can be run as separate processes. This option seems easier to code and maintain. This also seems to [perform better](https://medium.com/@fermads/node-js-process-load-balancing-comparing-cluster-iptables-and-nginx-6746aaf38272). These processes can be managed using forever or pm2.
+### Scalability:  
+Multiple consumers can be run as separate processes. This option seems easier to code and maintain. These processes can be managed using forever or pm2.
 
-Dependencies:  
+### Dependencies:  
 Fivebeans is used since it is well tested and popular. A thin wrapper has been written over fivebeans for use with `async await` syntax. This has led to much cleaner code. This also provides isolation agains api changes in fivebeans.
-
 
 ## Usage:  
 ### Configuration:
@@ -118,12 +117,6 @@ Start the load test using.
 npm run loadtest
 ```
 
-## Tests  
-Run the unit and integrations tests using
-```
-npm t
-```  
-
 ### Measuring throughput
 Producers and consumers will display throughput in ops/sec if `measure_throughput` is set to true in the Configuration.
 
@@ -134,3 +127,9 @@ Producer PID:8181 Throughput: 758.5302308360799 ops / second
 Producer PID:8181 Throughput: 705.9702588849336 ops / second
 
 ```
+
+## Tests  
+Run the unit and integrations tests using
+```
+npm t
+```  
