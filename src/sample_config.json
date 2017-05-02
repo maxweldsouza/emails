@@ -20,6 +20,9 @@
         "domain": "",
         "key": ""
     },
+    "sendinblue": {
+        "key": ""
+    },
     "sparkpost": {
         "key": ""
     }

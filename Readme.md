@@ -4,10 +4,10 @@
 E-mail service api
 
 ## Solution:  
-A beanstalkd queue with persistence to mongodb. Jobs can be added using a producer when adds then to the queue. Producer can be used as an import. One or more consumers process these jobs and send out mails. Consumers can be run independently as processes.
+A beanstalkd queue with persistence to mongodb. It consists of a producer and a consumer. The producer is an npm package that can be imported. The consumer can be run directly as a process. Multiple producers and consumers can be run simultaneously. Jobs are added using a producer which adds then to the queue. Consumers process these jobs and send out mails.
 
 Persistence:  
-When a job is added to a producer it's immediately saved to mongodb. Then it's added to the beanstalkd queue. The payload is the id of the object in mongodb. Although beanstalkd has persistence it is good to have the job in mongodb so that data can be looked up easily.
+When a job is added to a producer it's immediately saved to mongodb. Then it's added to the queue. Only the id of the mongodb object is added to the queue. Although beanstalkd has persistence it is good to have the job in mongodb so that data can be looked up easily.
 
 Vendor Selection:  
 Vendors are selected using round robin based on the jobid of the beanstalkd job.
@@ -19,7 +19,7 @@ Tests:
 Some tests need mongodb and beanstakld running. Tests are run on a specially named mongodb collection and beanstalkd tube so that they do not interfere with the production environment.
 
 Scalability:  
-Multiple consumers can be run as separate processes. This option seems easier to code and maintain. This also seems to [perform better](https://medium.com/@fermads/node-js-process-load-balancing-comparing-cluster-iptables-and-nginx-6746aaf38272).
+Multiple consumers can be run as separate processes. This option seems easier to code and maintain. This also seems to [perform better](https://medium.com/@fermads/node-js-process-load-balancing-comparing-cluster-iptables-and-nginx-6746aaf38272). These processes can be managed using forever or pm2.
 
 Dependencies:  
 Fivebeans is used since it is well tested and popular. A thin wrapper has been written over fivebeans for use with `async await` syntax. This has led to much cleaner code. This also provides isolation agains api changes in fivebeans.
@@ -28,6 +28,37 @@ Fivebeans is used since it is well tested and popular. A thin wrapper has been w
 ## Usage:  
 ### Configuration:
 A config.json file in the src directory is required to run. A sample_config.json file has been provided.
+```json
+{
+    "measure_throughput": true,
+    "beanstalkd": {
+		"hostname": "127.0.0.1",
+		"port": 11300,
+		"tube": "beanstalkd_tube_name"
+	},
+    "mongodb": {
+        "url": "mongodb://localhost:27017/dbname",
+        "collection": "mongo_collection_name"
+    },
+    "amazon": {
+        "region": "us-east-1",
+        "credentials": {
+            "accessKeyId": "",
+            "secretAccessKey": ""
+        }
+    },
+    "mailgun": {
+        "domain": "",
+        "key": ""
+    },
+    "sendinblue": {
+        "key": ""
+    },
+    "sparkpost": {
+        "key": ""
+    }
+}
+```
 
 ### Important Note
 Emails will only be sent when NODE_ENV is set to `production` otherwise email sending will only be simulated.
