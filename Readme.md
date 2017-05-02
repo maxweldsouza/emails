@@ -61,7 +61,7 @@ A config.json file in the src directory is required to run. A sample_config.json
 ```
 
 ### Important Note
-Emails will only be sent when NODE_ENV is set to `production` otherwise email sending will only be simulated.
+> Emails will only be sent when NODE_ENV is set to `production` otherwise email sending will only be simulated.
 
 ### Running
 Clone the git repository. Install dependencies using
@@ -95,25 +95,24 @@ await producer.send({
 await producer.quit();
 ```
 
-## Tests  
-Run the unit and integrations tests using
-```
-npm t
-```  
-
 ### Load test
+> Warning: DON'T run load tests using NODE_ENV=production. Email sending is enabled in production mode.
 
-To run the load test start one or more consumers using
+The load test will add several (10k) jobs to the queue. To run the load test start one or more consumers using
 ```
 npm run consumer
 ```
-
-Warning: DON'T run load tests using NODE_ENV=production. Email sending is enabled in production mode.
 
 Start the load test using.
 ```
 npm run loadtest
 ```
+
+## Tests  
+Run the unit and integrations tests using
+```
+npm t
+```  
 
 ### Measuring throughput
 Producers and consumers will display throughput in ops/sec if `measure_throughput` is set to true in the Configuration.
