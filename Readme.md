@@ -4,7 +4,7 @@
 E-mail service api
 
 ## Solution:  
-A beanstalkd queue with persistence to mongodb. It consists of a producer and a consumer. The producer is an npm package that can be imported. The consumer can be run directly as a process. Multiple producers and consumers can be run simultaneously. Jobs are added using a producer which adds then to the queue. Consumers process these jobs and send out mails.
+A beanstalkd queue with persistence to mongodb. It consists of a producer and a consumer. The producer is an npm package that can be imported. The consumer can be run directly as a process. Multiple producers and consumers can be run simultaneously. Jobs are added using a producer which adds them to the queue. Consumers process these jobs and send out mails.
 
 Persistence:  
 When a job is added to a producer it's immediately saved to mongodb. Then it's added to the queue. Only the id of the mongodb object is added to the queue. Although beanstalkd has persistence it is good to have the job in mongodb so that data can be looked up easily.
@@ -87,8 +87,6 @@ Run a consumer
 ```
 npm run consumer
 ```  
-
-This could also be run without building using babel-node. However babel-node should not be used in production.
 
 To use the producer  
 ```javascript
