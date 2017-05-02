@@ -60,7 +60,8 @@ export class Consumer extends Base {
 			setTimeout(this.run.bind(this), 0);
 		})
 		.catch((e) => {
-			console.error(e);
+			console.trace(e);
+			setTimeout(this.run.bind(this), 0);
 		});
 	}
 	async recieve() {
@@ -103,7 +104,7 @@ if (require.main === module) {
 		}
 		run_consumer(options);
 	} catch (e) {
-		console.error(e.stack);
+		console.trace(e);
 		throw e;
 	}
 }
