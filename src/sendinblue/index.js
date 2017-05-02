@@ -6,7 +6,7 @@ class SendInBlue extends VendorBase {
 	prepare({from, to, text, subject}) {
 		return {
 			from: [from],
-			to: {[to]: ""}, // Recipient name
+			to: {[to]: ''}, // Recipient name
 			subject,
 			text: text,
 			html: text // Mandatory for send in blue
@@ -14,10 +14,10 @@ class SendInBlue extends VendorBase {
 	}
 	async send(mail) {
 		let body = this.prepare(mail);
-		let res = await fetch(`https://api.sendinblue.com/v2.0/email`, {
+		let res = await fetch('https://api.sendinblue.com/v2.0/email', {
 			method: 'POST',
 			headers: {
-				"api-key": config.sendinblue.key
+				'api-key': config.sendinblue.key
 			},
 			body
 		});

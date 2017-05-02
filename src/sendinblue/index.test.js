@@ -9,7 +9,7 @@ test('Test sendinblue request format', () => {
 	});
 	expect(result).toMatchObject({
 		from: ['source@example.com'],
-		to: {'something@example.com': ""}, // Recipient name
+		to: {'something@example.com': ''}, // Recipient name
 		subject: 'Test email',
 		html: 'This is the mail body',
 		text: 'This is the mail body'

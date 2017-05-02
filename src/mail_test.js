@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
 import amazon from './amazon';
 import mailgun from './mailgun';
 import sendinblue from './sendinblue';
+/* eslint-enable no-unused-vars */
 import sparkpost from './sparkpost';
 
 let vendor = sparkpost;
