@@ -3,6 +3,7 @@ import {Producer} from './producer';
 import config from './config.json';
 
 async function load_test() {
+	console.log(`Load test started with PID: ${process.pid}`);
 	if (process.env === 'production') {
 		throw new Error('Dont run load test with NODE_ENV=production. Email sending is enabled.');
 	}
@@ -22,11 +23,7 @@ async function load_test() {
 			text: 'Hi'
 		});
 	}
-	process.on('SIGINT', async () => {
-		await producer.close();
-		console.log(`Producer with PID: ${process.pid} exiting`);
-		process.exit(0);
-	});
+	await producer.close();
 }
 
 load_test()

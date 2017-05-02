@@ -55,17 +55,19 @@ export class Consumer extends Base {
 		}
 	}
 	run() {
-		this.beanstalkd.reserve().then((job) => {
-			this.process(job);
-			setTimeout(this.run.bind(this), 0);
-		})
-		.catch((e) => {
-			console.trace(e);
-			setTimeout(this.run.bind(this), 0);
-		});
+		this.beanstalkd
+			.reserve()
+			.then(job => {
+				this.process(job);
+				setTimeout(this.run.bind(this), 0);
+			})
+			.catch(e => {
+				console.trace(e);
+				setTimeout(this.run.bind(this), 0);
+			});
 	}
 	async recieve() {
-        // Only for testing
+		// Only for testing
 		let job = await this.beanstalkd.reserve();
 		return await this.process(job);
 	}
@@ -82,19 +84,13 @@ export class Consumer extends Base {
 
 export async function run_consumer(options) {
 	let consumer = new Consumer(options);
-
 	await consumer.connect();
-	process.on('SIGINT', async () => {
-		await consumer.close();
-		console.log(`Consumer with PID: ${process.pid} exiting`);
-		process.exit(0);
-	});
-
 	consumer.run();
 }
 
 if (require.main === module) {
 	try {
+		console.log(`Consumer started with PID: ${process.pid}`);
 		let args = minimist(process.argv.slice(2));
 		let options;
 		if ('test' in args && args.test === true) {
