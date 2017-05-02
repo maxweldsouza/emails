@@ -86,7 +86,7 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 			_id: new ObjectID(job.payload.mongo_id)
 		});
 		// TODO clean this up
-		expect(item.vendor).toMatch(/Amazon|SparkPost/);
+		expect(item.vendor).toMatch(/Amazon|MailGun|SendInBlue|SparkPost/);
 		expect(item).toMatchObject({
 			to: 'something@example.com',
 			from: 'source@domain.com',
