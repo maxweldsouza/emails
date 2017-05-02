@@ -5,13 +5,10 @@ import config from './config.json';
 const MEASURE_THROUGHPUT_MS = 1000;
 
 export class Base {
-	constructor() {
-		this.beanstalkd = new FiveBeans();
-		this.mongodb = new MongoDB({
-			url: config.mongodb.url,
-			collection: config.mongodb.collection
-		});
-		this.tube = config.beanstalkd.tube;
+	constructor({mongo_config, beanstalkd_config}) {
+		this.beanstalkd = new FiveBeans(beanstalkd_config);
+		this.mongodb = new MongoDB(mongo_config);
+		this.tube = beanstalkd_config.tube;
 		this.throughput_count = 0;
 		if (config.measure_throughput) {
 			this.throughput();

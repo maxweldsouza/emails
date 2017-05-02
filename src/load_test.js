@@ -9,7 +9,10 @@ async function process_test() {
 
 	let count = 10000;
 
-	let producer = new Producer(config.beanstalkd);
+	let producer = new Producer({
+		monbo_config: config.test.mongo,
+		beanstalkd_config: config.test.beanstalkd
+	});
 	await producer.connect();
 	for (let i = 0; i < count; i++) {
 		await producer.send({

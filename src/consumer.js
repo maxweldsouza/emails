@@ -76,8 +76,8 @@ export class Consumer extends Base {
 	}
 }
 
-export async function run_consumer() {
-	let consumer = new Consumer(config.beanstalkd);
+export async function run_consumer(options) {
+	let consumer = new Consumer(options);
 
 	await consumer.connect();
 	process.on('SIGINT', async () => {
@@ -90,5 +90,5 @@ export async function run_consumer() {
 }
 
 if (require.main === module) {
-	run_consumer();
+	run_consumer({mongo_config: config.mongo, beanstalkd_config: config.beanstalkd});
 }

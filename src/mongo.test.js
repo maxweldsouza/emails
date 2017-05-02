@@ -11,13 +11,14 @@ describe('Mongodb integration', () => {
 		subject: 'Test subject',
 		body: 'hello'
 	};
-	const collection = config.mongodb.collection;
+	let uri = config.test.mongodb.uri;
+	let collection = config.test.mongodb.collection;
 
 	beforeAll(async () => {
-		mongodb = new MongoDB();
+		mongodb = new MongoDB({uri, collection});
 		await mongodb.connect();
 
-		db = await MongoClient.connect(config.mongodb.url);
+		db = await MongoClient.connect(uri);
 	});
 
 	beforeEach(async () => {

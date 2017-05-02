@@ -1,12 +1,11 @@
 import fivebeans from 'fivebeans';
-import config from './config.json';
 
 const CLEAR_TUBE_RESERVE_TIMEOUT_SECS = 0.1;
 const TIME_TO_RUN_SECS = 30;
 
 export default class FiveBeans {
-	constructor() {
-		this.client = new fivebeans.client(config.beanstalkd.hostname, config.beanstalkd.port);
+	constructor({hostname, port}) {
+		this.client = new fivebeans.client(hostname, port);
 	}
 	connect() {
 		return new Promise((resolve, reject) => {

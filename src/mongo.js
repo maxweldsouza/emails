@@ -2,12 +2,12 @@ import {ObjectID, MongoClient} from 'mongodb';
 import config from './config.json';
 
 export default class MongoDB {
-	constructor() {
-		this.url = config.mongodb.url;
-		this.collection = config.mongodb.collection;
+	constructor({uri, collection}) {
+		this.uri = uri;
+		this.collection = collection;
 	}
 	async connect() {
-		this.conn = await MongoClient.connect(this.url);
+		this.conn = await MongoClient.connect(this.uri);
 		this.pipe = this.conn.collection(this.collection);
 	}
 	async close() {

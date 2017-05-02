@@ -11,21 +11,30 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 	let mongo;
 	let fivebeans;
 
+	let uri = config.test.mongodb.uri;
+	let collection = config.test.mongodb.collection;
+	let tube = config.test.beanstalkd.tube;
+	let hostname = config.test.beanstalkd.hostname;
+	let port = config.test.beanstalkd.port;
+
+	let mongo_config = {uri, collection};
+	let beanstalkd_config = {tube, hostname, port};
+
 	beforeAll(async () => {
-		producer = new Producer();
-		consumer = new Consumer();
+		producer = new Producer({mongo_config, beanstalkd_config});
+		consumer = new Consumer({mongo_config, beanstalkd_config});
 		await producer.connect();
 		await consumer.connect();
 
-		mongo = await MongoClient.connect(config.mongodb.url);
+		mongo = await MongoClient.connect(uri);
 
-		fivebeans = new FiveBeans();
+		fivebeans = new FiveBeans({hostname, port});
 		await fivebeans.connect();
 	});
 
 	beforeEach(async () => {
-		await mongo.collection(config.mongodb.collection).remove();
-		await fivebeans.watch(config.beanstalkd.tube);
+		await mongo.collection(collection).remove();
+		await fivebeans.watch(tube);
 		await fivebeans._danger_clear_tube();
 	});
 
@@ -41,7 +50,7 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 			text: 'hello'
 		});
 		expect(mongo_id).toBeTruthy();
-		let item = await mongo.collection(config.mongodb.collection).findOne({
+		let item = await mongo.collection(collection).findOne({
 			_id: mongo_id
 		});
 		expect(item).toMatchObject({
@@ -73,7 +82,7 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 		});
 		let job = await consumer.recieve();
 
-		let item = await mongo.collection(config.mongodb.collection).findOne({
+		let item = await mongo.collection(collection).findOne({
 			_id: new ObjectID(job.payload.mongo_id)
 		});
 		// TODO clean this up
@@ -102,10 +111,10 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 	});
 
 	afterAll(async () => {
-		await mongo.collection(config.mongodb.collection).remove();
+		await mongo.collection(collection).remove();
 		await mongo.close();
 
-		await fivebeans.watch(config.beanstalkd.tube);
+		await fivebeans.watch(tube);
 		await fivebeans._danger_clear_tube();
 		await fivebeans.quit();
 

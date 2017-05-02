@@ -31,14 +31,25 @@ A config.json file in the src directory is required to run. A sample_config.json
 ```json
 {
     "measure_throughput": true,
+    "test": {
+        "beanstalkd": {
+            "hostname": "127.0.0.1",
+            "port": 11300,
+            "tube": "test_integration"
+        },
+        "mongodb": {
+            "uri": "mongodb://localhost:27017/test",
+            "collection": "test_mails"
+        }
+    },
     "beanstalkd": {
-		"hostname": "127.0.0.1",
-		"port": 11300,
-		"tube": "beanstalkd_tube_name"
-	},
+        "hostname": "127.0.0.1",
+        "port": 11300,
+        "tube": "email_queue"
+    },
     "mongodb": {
-        "url": "mongodb://localhost:27017/dbname",
-        "collection": "mongo_collection_name"
+        "uri": "mongodb://localhost:27017/dbname",
+        "collection": "emails"
     },
     "amazon": {
         "region": "us-east-1",
