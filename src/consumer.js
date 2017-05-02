@@ -2,9 +2,11 @@ import minimist from 'minimist';
 import {Base} from './base.js';
 import Amazon from './amazon';
 import Sparkpost from './sparkpost';
+import Mailgun from './mailgun';
+import Sendinblue from './sendinblue';
 import config from './config.json';
 
-let vendors = [Amazon, Sparkpost];
+let vendors = [Amazon, Mailgun, Sendinblue, Sparkpost];
 
 class NoServiceAvailable extends Error {
 	constructor(...args) {
