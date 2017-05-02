@@ -102,9 +102,13 @@ describe('Integration tests with beanstalkd and mongodb', () => {
 	});
 
 	afterAll(async () => {
-		await producer.close();
+		await mongo.collection(config.mongodb.collection).remove();
+		await mongo.close();
 
+		await fivebeans.watch(config.beanstalkd.tube);
+		await fivebeans._danger_clear_tube();
 		await fivebeans.quit();
-		mongo.close();
+
+		await producer.close();
 	});
 });

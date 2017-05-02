@@ -40,9 +40,10 @@ describe('Mongodb integration', () => {
 		expect(item.vendor).toBe('amazon');
 	});
 
-	afterAll(() => {
-		mongodb.close();
+	afterAll(async () => {
+		await db.collection(collection).remove();
+		await db.close();
 
-		db.close();
+		await mongodb.close();
 	});
 });
